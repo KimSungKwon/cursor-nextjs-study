@@ -1,0 +1,71 @@
+---
+alwaysApply: true
+---
+
+Next.js 16(App Router) 프로젝트에 아래 구조의 "폴더와 빈 파일"을 생성해줘.
+코드는 최소로 넣고(어떤 기능/페이지인지 텍스트로 placeholder 등), 경로만 정확히 맞춰줘.
+
+---
+
+## ✅ 기술 스택
+- Next.js 16.1.1 (App Router)
+- TypeScript
+- React Server Component 기본
+- Tailwind CSS
+- import alias: @/*
+
+---
+
+## ✅ 프로젝트 성격
+- 커머스 사용자 영역 + 관리자 대시보드가 공존하는 프로젝트
+- App Router 기반
+- Route Group, Dynamic Route 적극 활용
+- 유지보수/확장성 최우선
+
+---
+
+## ✅ 폴더 구조 (반드시 이 구조를 따를 것)
+
+
+app/
+- layout.tsx
+- globals.css
+- page.tsx
+- _providers/ReactQueryProvider.tsx
+- (auth)/login/page.tsx
+- (auth)/signup/page.tsx
+- (commerce)/layout.tsx
+- (commerce)/page.tsx
+- (commerce)/products/page.tsx
+- (commerce)/products/[productId]/page.tsx
+- (commerce)/cart/page.tsx
+- (commerce)/checkout/page.tsx
+- (commerce)/account/page.tsx
+- admin/layout.tsx
+- admin/page.tsx
+- admin/products/page.tsx
+- admin/orders/page.tsx
+- api/products/route.ts
+- api/products/[productId]/route.ts
+
+components/ui/
+components/commerce/
+components/admin/
+
+commons/store/
+commons/types/
+commons/utils/cn.ts
+
+features/products/api/useProductsQuery.ts
+features/orders/api/useCreateOrderMutation.ts
+
+lib/supabase/
+lib/auth/
+
+types/supabase.ts
+
+규칙:
+- import는 @/* alias 사용
+- placeholder 구현이어도 되지만 빌드 깨지지 않게만
+- Server Component 기본 유지, 필요한 곳만 'use client'
+- 지금은 외부 라이브러리를 설치하지 않고 폴더 구조만 잡는다

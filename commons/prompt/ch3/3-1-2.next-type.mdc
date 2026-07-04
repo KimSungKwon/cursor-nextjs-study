@@ -1,0 +1,97 @@
+---
+alwaysApply: true
+---
+다음 타입 정의를 참고하여 코드를 작성해주세요:
+(단, supabase 타입은 제외)
+
+## 프로젝트 타입 레이어
+1. 공통 타입 (commons/types/)
+  - ProductDetail: 상품 상세 정보
+  - UserSession: 사용자 세션 정보
+
+2. 데이터베이스 타입 (types/supabase.ts)
+  - Database: Supabase 전체 스키마 타입
+  - Database["public"]["Tables"]["products"]["Row"]
+
+3. 컴포넌트 타입 (components/*/types.ts)
+  - Product: 상품 목록용 타입
+  - CartItem: 장바구니 아이템 타입
+
+4. 기능별 타입 (features/*/api/types.ts)
+  - CreateOrderInput: 주문 생성 입력
+  - CreateOrderResult: 주문 생성 결과
+
+5. 스토어 타입 (commons/store/*.ts)
+  - SessionState: 세션 스토어 상태
+  - CartState: 장바구니 스토어 상태
+
+## 프로젝트 타입 정의
+
+### 1. 상품 관련 타입
+```typescript
+// commons/types/product.ts
+export interface ProductDetail {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  salePrice?: number;
+  image_url: string | null;
+  status: "registered" | "hidden" | "sold_out";
+  created_at: string | null;
+  updated_at: string | null;
+  additional_info?: string | null;
+  measurements?: string | null;
+  categories?: ProductCategory[] | null;
+  rating?: number;
+  reviewCount?: number;
+}
+
+// components/commerce/types.ts
+export interface Product {
+  id: string;
+  name: string;
+  price: number;
+  salePrice?: number;
+  imageUrl: string;
+  rating?: number;
+  reviewCount?: number;
+  isLiked?: boolean;
+}
+```
+
+### 2. 사용자 관련 타입
+```typescript
+// commons/store/session-store.ts
+export type UserRole = "user" | "super_admin";
+
+export interface UserSession {
+  id: string;
+  email: string;
+  displayName: string | null;
+  role: UserRole;
+}
+```
+
+### 3. 주문 관련 타입
+```typescript
+// features/orders/api/types.ts
+export type CreateOrderInput = {
+  userId: string;
+  items: {
+    productId: string;
+    quantity: number;
+    unitPrice: number;
+  }[];
+};
+
+export type CreateOrderResult = {
+  orderId: string;
+};
+```
+
+## 요구사항
+- 위 타입 정의를 반드시 사용하세요
+- any 타입 사용을 지양하세요
+- 타입 가드를 활용하여 런타임 검증을 수행하세요
+- 경로 alias (@/)를 사용하여 import하세요
