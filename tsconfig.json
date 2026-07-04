@@ -19,7 +19,12 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],                    // 루트 기준
+      "@/components/*": ["./components/*"],
+      "@/lib/*": ["./lib/*"],
+      "@/commons/*": ["./commons/*"],
+      "@/features/*": ["./features/*"],
+      "@/types/*": ["./types/*"]
     }
   },
   "include": [
