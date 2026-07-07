@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
 
-// 초기 스키마 마이그레이션
-const MIGRATION_FILE = "supabase/migrations/0001_init_schema.sql";
+// RLS 활성화 및 정책 마이그레이션
+const MIGRATION_FILE = "supabase/migrations/0002_enable_rls_and_policies.sql";
 
 function loadEnvLocal(): void {
   const envPath = resolve(process.cwd(), ".env.local");
@@ -75,7 +75,7 @@ async function executeQuery(
   return response.json();
 }
 
-async function runMigration(): Promise<void> {
+async function runRls(): Promise<void> {
   loadEnvLocal();
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -132,7 +132,7 @@ async function runMigration(): Promise<void> {
   console.log(`마이그레이션 완료: ${MIGRATION_FILE}`);
 }
 
-runMigration().catch((error: unknown) => {
+runRls().catch((error: unknown) => {
   const message = error instanceof Error ? error.message : String(error);
 
   console.error(message);
