@@ -7,5 +7,11 @@ Study repository for learning Next.js frontend development with Cursor AI
 
 ## 실행 방법
 ```bash
-npm install
-npm run dev
+yarn install
+yarn dev
+```
+
+## DB 마이그레이션
+```bash
+yarn db:run-migration
+```
