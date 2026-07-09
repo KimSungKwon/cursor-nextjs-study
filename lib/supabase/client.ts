@@ -5,7 +5,7 @@ import { getPublicEnv } from "@/commons/config/env";
 
 let browserClient: ReturnType<typeof createBrowserClient> | undefined;
 
-export function createSupabaseClient() {
+export function getSupabaseBrowserClient() {
   if (!browserClient) {
     const { supabase } = getPublicEnv();
 

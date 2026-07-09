@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ProductsJsonPreview } from "@/components/commerce/ProductsJsonPreview";
 
 export default function CommerceHomePage() {
   return (
@@ -22,6 +23,11 @@ export default function CommerceHomePage() {
           마이페이지
         </Link>
       </nav>
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-medium">상품 데이터 (JSON)</h2>
+        <ProductsJsonPreview />
+      </section>
 
       <div className="flex flex-wrap gap-4 text-sm text-zinc-600">
         <Link href="/login">로그인</Link>
