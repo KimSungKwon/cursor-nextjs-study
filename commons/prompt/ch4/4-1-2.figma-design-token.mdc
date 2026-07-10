@@ -1,0 +1,60 @@
+---
+alwaysApply: false
+---
+이 Figma 디자인 파일들을 분석해서
+커머스와 어드민의 색상 및 타이포그래피 토큰을 추출해줘.
+
+커머스 UI:
+https://www.figma.com/design/PrPYG8hrEWB6IMFit7gol5/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=245-3108&t=Fd2iho1x8fX8spns-4
+
+어드민 UI:
+https://www.figma.com/design/PrPYG8hrEWB6IMFit7gol5/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=245-10962&t=Fd2iho1x8fX8spns-4
+
+현재 프로젝트에 constants/color.ts와 constant/typography.ts를 생성해서
+커머스와 어드민을 구분하여 토큰을 정리해줘.
+
+---
+
+color.ts 예시:
+
+```
+// commons/constants/color.ts
+
+// Commerce Color Palette
+export const commerceColors = {
+  primary: {
+    main: "#141718",
+    dark: "#121212",
+    light: "#23262f",
+  },
+  background: {
+    default: "#ffffff",
+    paper: "#fefefe",
+    light: "#f3f5f7",
+    // ...
+  },
+  text: {
+    primary: "#000000",
+    secondary: "#141718",
+    // ...
+  },
+  // ...
+} as const;
+
+// Admin Color Palette
+export const adminColors = {
+  primary: {
+    main: "#141718",
+    dark: "#121212",
+    light: "#23262f",
+  },
+  background: {
+    default: "#ffffff",
+    paper: "#fefefe",
+    light: "#f3f5f7",
+    gray: "#cac5cd", // 어드민 전용 색상
+    // ...
+  },
+  // ...
+} as const;
+```
