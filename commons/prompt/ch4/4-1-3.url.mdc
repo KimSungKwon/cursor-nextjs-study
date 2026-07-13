@@ -1,0 +1,40 @@
+이 Figma 디자인 파일들을 분석해서 
+각 페이지의 구조와 계층을 파악해줘.
+
+커머스 UI: 
+https://www.figma.com/design/wi8a6by2DxDzvTOBu2yyUE/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=245-3108&t=zIP0cpKeTzH1YNsH-4
+
+어드민 UI:
+https://www.figma.com/design/wi8a6by2DxDzvTOBu2yyUE/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=245-10962&t=zIP0cpKeTzH1YNsH-4
+
+다음 정보를 추출해줘:
+1. 각 페이지의 이름과 목적
+2. 페이지 간의 계층 구조 (부모-자식 관계)
+3. 네비게이션 메뉴 구조 (사이드바, 상단 메뉴 등)
+4. 각 페이지가 커머스인지 어드민인지 구분
+5. 동적 라우트가 필요한 페이지 (예: 상품 상세, 주문 상세)
+6. 접근 권한 추정 (공개/회원전용/관리자전용)
+
+결과를 다음과 같은 형식으로 정리해줘:
+- 페이지명: URL 경로 (접근 권한) [동적 라우트 여부]
+
+=====
+
+Figma에서 분석한 페이지 구조를 기반으로 
+commons/constants/url.ts에 URL enum을 추가해줘.
+
+현재 프로젝트의 url.ts 구조:
+- AUTH_URLS: 인증 관련 URL
+- ACCOUNT_URLS: 회원 전용 페이지 URL
+- COMMERCE_URLS: 커머스 공개 페이지 URL
+- ADMIN_URLS: 관리자 전용 페이지 URL
+
+요구사항:
+1. Figma에서 분석한 페이지를 적절한 URL 그룹에 분류
+2. 각 URL은 UPPER_SNAKE_CASE로 네이밍
+3. 동적 라우트는 함수로 정의 (예: ORDER_DETAIL: (id: string) => `/path/${id}`)
+4. 접근 권한을 고려하여 ROUTE_CONFIG_MAP에도 추가
+5. 기존 구조와 일관성 유지
+
+Figma 분석 결과:
+[Figma MCP에서 추출한 페이지 목록]
