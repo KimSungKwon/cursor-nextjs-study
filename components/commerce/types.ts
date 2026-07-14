@@ -7,6 +7,8 @@ export interface Product {
   rating?: number;
   reviewCount?: number;
   isLiked?: boolean;
+  isNew?: boolean;
+  discountPercent?: number;
 }
 
 export interface CartItem {
@@ -16,4 +18,18 @@ export interface CartItem {
   salePrice?: number;
   imageUrl: string;
   quantity: number;
+  optionLabel?: string;
+}
+
+export interface ShippingOption {
+  id: string;
+  label: string;
+  price: number;
+}
+
+export function formatCommercePrice(value: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(value);
 }
