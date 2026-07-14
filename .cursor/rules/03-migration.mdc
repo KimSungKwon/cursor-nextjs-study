@@ -1,13 +1,7 @@
 ---
+description: Supabase 마이그레이션·RLS·시드 작업 시 TypeScript 스크립트와 Management API만 사용하고, supabase CLI·SQL Editor 직접 실행은 금지한다.
 alwaysApply: false
 ---
-description: |
-  Supabase 마이그레이션은 반드시 TypeScript 스크립트로 실행.
-  supabase CLI 명령어나 SQL Editor 직접 실행은 사용하지 않음.
-globs:
-  - "scripts/**/*.ts"
-  - "supabase/migrations/**/*.sql"
-alwaysApply: false
 
 # Supabase 마이그레이션 규칙
 
