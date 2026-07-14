@@ -1,0 +1,336 @@
+---
+alwaysApply: false
+---
+
+# Figma 어드민 컴포넌트 분석 결과
+
+- 소스: Admin 컴포넌트 `node-id=310:2924`
+- 분석 도구: TalkToFigma MCP (channel `0ia513zx`)
+- 프로젝트 목표 경로: `components/admin/*`
+- 기존 코드: `AdminPageHeader` + `app/admin/layout.tsx` 스텁 + `components/ui/*`
+- 디자인 토큰: `--admin-*` (`globals.css`) / `adminColors` · `adminTypography`
+
+---
+
+## 1. Figma 디자인에 있는 컴포넌트 목록
+
+| Figma 이름 | 매핑 대상 | 크기(대략) |
+|------------|-----------|------------|
+| Menu (Logo + Section + List) | AdminSidebar | 260×1200 |
+| List (active/default) | AdminSidebar 메뉴 아이템 | 232×40 |
+| Table Header Row | AdminTable 헤더 | 1128×47 |
+| Table Row + Table Cell | AdminTable 데이터 행 | 1128×50 |
+| Table Row (Showing + Pagination) | AdminTablePagination | 1128×70 |
+| Form (Search by order id) | AdminFilterBar 검색 필드 | 200×40 |
+| Dropdown (Filter by date range) | AdminFilterBar 필터 | 199×40 |
+| Label Enable/disable (Slack/Notion) | Switch (설정용, Sidebar/Settings 연계) | 44×24 |
+| 실시간 매출 알림 카드 | SettingsCard (설정 블록) | 1128×206 |
+| Active 상태 텍스트 | AdminStatusBadge / StatusText | 15px |
+
+> **AdminMetricCard / AdminHeader / AdminTopbar**: `310:2924` 보드에 단독 프레임 없음  
+> → 대시보드 페이지 프레임에서 보완하거나, Header/Topbar는 Layout 조합으로 설계
+
+### UI 재사용 (신규 제작 최소화)
+
+- SearchInput / Input — 주문 ID 검색
+- Dropdown — 날짜 필터·페이지 size
+- Pagination — 페이지 번호 셀 (28×28)
+- StatusText — Active 등 상태 색 텍스트
+
+---
+
+## 2. 기존 vs 신규 vs 확장
+
+### 프로젝트 목표 목록 대비
+
+| 목표 컴포넌트 | 판정 | 비고 |
+|---------------|------|------|
+| AdminTable | 신규 | Header+Row+Cell 조합, 제네릭 |
+| AdminFilterBar | 신규 | Search + date Dropdown |
+| AdminMetricCard | 신규 | 보드에 없음 → KPI 카드 패턴으로 신규 설계 |
+| AdminStatusBadge | 신규 | Active `#28c76f` 등 상태 배지/텍스트 |
+| AdminLayout | 확장 | `app/admin/layout.tsx` 스텁 → Sidebar+메인 슬롯 |
+| AdminHeader | 신규/확장 | 페이지 상단 타이틀 영역 (`AdminPageHeader` 확장 가능) |
+| AdminSidebar | 신규 | Figma Menu 전체 |
+| AdminTablePagination | 신규 | Showing + pageSize + Pagination |
+| AdminTopbar | 신규 | 보드 미존재 → 검색/유저 영역용 선택 컴포넌트 |
+
+### 기존 코드
+
+- AdminPageHeader: 타이틀·설명만 있음 → **확장**하여 AdminHeader로 통합 가능
+- app/admin/layout.tsx: 임시 aside → **AdminLayout + AdminSidebar**로 교체
+
+---
+
+## 3. 기존 컴포넌트를 확장해야 하는 부분
+
+| 대상 | 확장 내용 |
+|------|-----------|
+| `AdminPageHeader` | Breadcrumb, primary action(CTA), filter slot → AdminHeader |
+| `app/admin/layout.tsx` | AdminLayout으로 분리, Sidebar/Main/Topbar 슬롯 |
+| `StatusText` | admin Active `#28c76f` / Inactive / Pending 매핑 확인 |
+| `Pagination` | Admin 테이블 푸터와 pageSize dropdown 조합 |
+| `Dropdown` | Filter by date range placeholder muted 스타일 |
+| `SearchInput` | admin variant · Public Sans 15px muted |
+
+---
+
+## 4. Props 인터페이스 설계
+
+### AdminSidebar (신규)
+
+```ts
+interface AdminSidebarItem {
+  id: string;
+  label: string;
+  href: string;
+  icon?: ReactNode;
+  badgeCount?: number;
+  children?: AdminSidebarItem[];
+}
+
+interface AdminSidebarSection {
+  id: string;
+  title: string; // MAIN MENU | PRODUCTS | ADMIN
+  items: AdminSidebarItem[];
+}
+
+interface AdminSidebarProps {
+  logoText?: string; // "Cursor Commerce"
+  sections: AdminSidebarSection[];
+  activeId?: string;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+  onNavigate?: (id: string, href: string) => void;
+  className?: string;
+}
+```
+
+### AdminLayout (확장/신규)
+
+```ts
+interface AdminLayoutProps {
+  children: ReactNode;
+  sidebar?: ReactNode;
+  topbar?: ReactNode;
+  className?: string;
+}
+```
+
+### AdminHeader (신규 — AdminPageHeader 확장)
+
+```ts
+interface AdminHeaderProps {
+  title: string;
+  description?: string;
+  actions?: ReactNode;
+  breadcrumbs?: Array<{ label: string; href?: string }>;
+  className?: string;
+}
+```
+
+### AdminTopbar (신규, 선택)
+
+```ts
+interface AdminTopbarProps {
+  searchSlot?: ReactNode;
+  rightSlot?: ReactNode; // 알림/유저
+  className?: string;
+}
+```
+
+### AdminFilterBar (신규)
+
+```ts
+interface AdminFilterBarProps {
+  searchPlaceholder?: string; // "Search by order id"
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  dateRangeLabel?: string; // "Filter by date range"
+  dateRangeOptions?: Array<{ value: string; label: string }>;
+  dateRangeValue?: string;
+  onDateRangeChange?: (value: string) => void;
+  extraFilters?: ReactNode;
+  className?: string;
+}
+```
+
+### AdminTable (신규)
+
+```ts
+interface AdminTableColumn<T> {
+  id: string;
+  header: string;
+  width?: number | string;
+  align?: "left" | "center" | "right";
+  cell: (row: T) => ReactNode;
+}
+
+interface AdminTableProps<T> {
+  columns: AdminTableColumn<T>[];
+  rows: T[];
+  rowKey: (row: T) => string;
+  isLoading?: boolean;
+  emptyMessage?: string;
+  onRowClick?: (row: T) => void;
+  className?: string;
+}
+```
+
+### AdminTablePagination (신규)
+
+```ts
+interface AdminTablePaginationProps {
+  page: number;
+  totalPages: number;
+  pageSize: number;
+  totalItems: number;
+  pageSizeOptions?: number[]; // [10, 25, 50]
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
+  className?: string;
+}
+```
+
+### AdminStatusBadge (신규)
+
+```ts
+type AdminStatus = "active" | "inactive" | "pending" | "error";
+
+interface AdminStatusBadgeProps {
+  status: AdminStatus;
+  label?: string; // 미지정 시 status 기본 라벨
+  className?: string;
+}
+```
+
+### AdminMetricCard (신규 — 보드 외 설계)
+
+```ts
+interface AdminMetricCardProps {
+  title: string;
+  value: string | number;
+  delta?: string; // "+12%"
+  deltaTone?: "up" | "down" | "neutral";
+  icon?: ReactNode;
+  className?: string;
+}
+```
+
+### SettingsSwitch / SettingsCard (Settings 페이지용, 보조)
+
+```ts
+interface AdminSwitchProps {
+  checked: boolean;
+  onChange?: (checked: boolean) => void;
+  disabled?: boolean;
+  "aria-label": string;
+  className?: string;
+}
+
+interface AdminSettingsCardProps {
+  title: string;
+  description?: string;
+  icon?: ReactNode;
+  enabled: boolean;
+  onEnabledChange?: (enabled: boolean) => void;
+  children?: ReactNode; // threshold input 등
+  className?: string;
+}
+```
+
+---
+
+## 5. 디자인 토큰 (`--admin-*`)
+
+토큰 소스: `app/globals.css` · `commons/constants/color.ts` (`adminColors`) · `typography.ts` (`adminTypography`)
+
+### 색상
+
+| 용도 | 값 | CSS 변수 / TS |
+|------|-----|----------------|
+| Primary (CTA/링크) | `#155dfc` | `--admin-primary-main` / `adminColors.primary.main` |
+| 사이드바 텍스트 강조 | `#23272e` | (Figma 전용, grey에 근접) `adminColors.text.primary` `#0a0a0a` 또는 grey |
+| Muted (메뉴·헤더·placeholder) | `#8b909a` | `--admin-text-muted` 근접 `#99a1af` — Figma `#8b909a` 우선 매핑 권장 |
+| Active 메뉴 bg | `#f3f4f8` | `--admin-background-light` `#f3f4f6` 근접 |
+| Active 상태 텍스트 | `#28c76f` | success 계열 (Figma 전용 값, semantic.success `#38cb89`와 구분 검토) |
+| 테이블 보더 | `#e9e7fd` / `#dbdade` | `--admin-border-*` 보완 또는 하드코드 후 토큰화 |
+| Pagination active | `#141718` + `#ffffff` | `--admin-grey-500` / inverse |
+| Pagination default | `#f1f2f6` | paper/light 계열 |
+| Switch ON track | `#1f2937` | grey-900 계열 |
+| Switch OFF track | `#e5e7eb` | border/light |
+| Settings icon bg | `#eff6ff` + icon `#2563eb` | primary tint |
+| Badge (사이드) | `#7367f0` @16% + text | (Figma violet — 별도 토큰 검토) |
+
+### 타이포 (`--admin-*` / Public Sans · Inter · Poppins)
+
+| 요소 | Font | Size / Weight |
+|------|------|----------------|
+| 사이드바 로고 | Poppins Medium | 20 / lh24 |
+| 섹션 라벨 | Public Sans Regular | 11 / `#8b909a` |
+| 메뉴 아이템 | Public Sans | 15 SemiBold(active) / Regular(default) |
+| 테이블 헤더 | Public Sans Medium | 13 / muted |
+| 테이블 셀 | Public Sans Regular | 15 / `#23272e` |
+| 검색/필터 | Public Sans | 15 Medium/Regular muted |
+| Pagination 숫자 | Public Sans | 13 |
+| Settings 제목 | Poppins SemiBold | 16 |
+| Settings 본문 | Poppins Medium / Inter | 14 / helper 12 |
+
+프로젝트 기본 토큰은 Inter 중심(`adminTypography`)이므로, Figma Public Sans는 Inter로 대체하거나 폰트 패밀리 확장.
+
+### 간격·크기
+
+- Sidebar: 260 폭, 로고 h64, 메뉴 아이템 h40 · r6, 아이콘 22
+- Table: 전체 폭 1128, 헤더 h47, 행 h50, 셀 ~218
+- Pagination cell: 28×28 · r4
+- Filter/Search: h40 · r4~6
+- Switch: 44×24, thumb 20, pill
+- Settings card: r12, padding ~25
+
+---
+
+## 6. 컴포넌트 상태
+
+| 컴포넌트 | Figma 확인 | 구현 권장 |
+|----------|------------|-----------|
+| AdminSidebar / MenuItem | default, active(`#f3f4f8`+SemiBold) | hover, focus, collapsed |
+| AdminTable row | default | hover, selected, loading skeleton |
+| AdminStatusBadge | Active(green) | inactive, pending, error |
+| AdminTablePagination | active page `#141718` | disabled first/last |
+| AdminFilterBar Dropdown | default(placeholder muted) | open, disabled |
+| Search Form | default | focus, disabled |
+| Switch | on(`#1f2937`) / off(`#e5e7eb`) | disabled, focus |
+| SettingsCard | enabled + input 노출 | loading, disabled |
+| AdminMetricCard | (보드 없음) | default, loading |
+
+---
+
+## 7. 요약 (요청 형식)
+
+- AdminSidebar: 로고·섹션·메뉴·뱃지·collapse (신규) [`sections`, `activeId?`, `collapsed?`, `onToggleCollapse?`, `onNavigate?`]
+- AdminLayout: Sidebar + Topbar + Main 슬롯 (확장) [`children`, `sidebar?`, `topbar?`]
+- AdminHeader: 페이지 타이틀·설명·액션 (`AdminPageHeader` 확장) [`title`, `description?`, `actions?`, `breadcrumbs?`]
+- AdminTopbar: 상단 유틸 영역 (신규·선택) [`searchSlot?`, `rightSlot?`]
+- AdminFilterBar: 주문 검색 + 날짜 필터 (신규) [`searchValue?`, `onSearchChange?`, `dateRangeOptions?`, `dateRangeValue?`, `onDateRangeChange?`]
+- AdminTable: 제네릭 헤더/행/셀 테이블 (신규) [`columns`, `rows`, `rowKey`, `isLoading?`, `onRowClick?`]
+- AdminTablePagination: Showing · pageSize · 페이지 번호 (신규) [`page`, `totalPages`, `pageSize`, `totalItems`, `onPageChange?`, `onPageSizeChange?`]
+- AdminStatusBadge: Active 등 상태 표시 (신규) [`status`, `label?`]
+- AdminMetricCard: 대시보드 KPI 카드 (신규·보드 외) [`title`, `value`, `delta?`, `deltaTone?`, `icon?`]
+- AdminSwitch / AdminSettingsCard: 설정 토글·카드 (신규·Settings) [`checked`/`enabled`, `onChange`, `title`, `description?`, `children?`]
+
+---
+
+## 8. 구현 우선순위
+
+1. AdminStatusBadge  
+2. AdminSidebar (+ MenuItem)  
+3. AdminLayout  
+4. AdminHeader (`AdminPageHeader` 확장)  
+5. AdminTable  
+6. AdminTablePagination  
+7. AdminFilterBar  
+8. AdminMetricCard  
+9. AdminTopbar (선택)  
+10. AdminSwitch / AdminSettingsCard (Settings 페이지)
+
+의존: `components/ui`의 Pagination, Dropdown, SearchInput, StatusText + `--admin-*` / `adminColors` / `adminTypography`
