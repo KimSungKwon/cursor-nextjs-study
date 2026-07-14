@@ -9,7 +9,10 @@
     "lint": "eslint",
     "db:run-migration": "tsx scripts/run-migration.ts",
     "db:run-rls": "tsx scripts/run-rls.ts",
-    "db:seed-products": "tsx scripts/seed-products.ts"
+    "db:seed-products": "tsx scripts/seed-products.ts",
+    "storybook": "node scripts/run-storybook.js dev -p 6006",
+    "build-storybook": "node scripts/run-storybook.js build",
+    "postinstall": "node scripts/patch-next-config-shim.js"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.15.0",
@@ -22,6 +25,13 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@storybook/addon-essentials": "8.6.14",
+    "@storybook/addon-interactions": "8.6.14",
+    "@storybook/addon-links": "8.6.14",
+    "@storybook/nextjs": "8.6.14",
+    "@storybook/react": "8.6.14",
+    "@storybook/test": "8.6.14",
+    "@storybook/theming": "8.6.14",
     "@tailwindcss/postcss": "^4",
     "@tanstack/react-query-devtools": "^5.101.2",
     "@types/node": "^20",
@@ -29,6 +39,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "storybook": "8.6.14",
     "tailwindcss": "^4",
     "tsx": "^4.20.3",
     "typescript": "^5"
