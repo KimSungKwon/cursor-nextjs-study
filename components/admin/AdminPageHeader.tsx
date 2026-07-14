@@ -1,15 +1,23 @@
-type AdminPageHeaderProps = {
-  title: string;
-  description?: string;
-};
+import {
+  AdminHeader,
+  type AdminHeaderProps,
+} from "@/components/admin/AdminHeader/AdminHeader";
 
-export const AdminPageHeader = ({ title, description }: AdminPageHeaderProps) => {
+export type AdminPageHeaderProps = Pick<
+  AdminHeaderProps,
+  "title" | "description" | "className"
+>;
+
+export const AdminPageHeader = ({
+  title,
+  description,
+  className,
+}: AdminPageHeaderProps) => {
   return (
-    <div className="border-b px-6 py-4">
-      <h1 className="text-xl font-semibold">{title}</h1>
-      {description ? (
-        <p className="mt-1 text-sm text-zinc-600">{description}</p>
-      ) : null}
-    </div>
+    <AdminHeader
+      title={title}
+      description={description}
+      className={className}
+    />
   );
 };
