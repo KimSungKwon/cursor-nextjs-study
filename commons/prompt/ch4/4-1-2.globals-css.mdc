@@ -1,3 +1,56 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+color.ts와 typography.ts의 토큰을 
+app/globals.css의 :root에 CSS 변수로 변환해줘.
+
+요구사항:
+1. --commerce-* prefix로 커머스 토큰 정의
+2. --admin-* prefix로 어드민 토큰 정의
+3. 기존 네이밍 컨벤션 유지 (kebab-case)
+4. 모바일 타이포그래피는 @media (max-width: 768px)에 정의
+
+변환할 파일:
+- commons/constants/color.ts
+- commons/constants/typography.ts
+
+---
+
+예시
+
+```
+/* app/globals.css */
+
+:root {
+  /* Commerce Color Tokens */
+  --commerce-primary-main: #141718;
+  --commerce-primary-dark: #121212;
+  --commerce-background-default: #ffffff;
+  --commerce-text-primary: #000000;
+  /* ... */
+
+  /* Admin Color Tokens */
+  --admin-primary-main: #141718;
+  --admin-background-default: #ffffff;
+  --admin-background-gray: #cac5cd; /* 어드민 전용 */
+  /* ... */
+
+  /* Commerce Typography Tokens */
+  --commerce-font-primary: var(--font-poppins), "Poppins", sans-serif;
+  --commerce-font-size-base: 16px;
+  --commerce-font-weight-regular: 400;
+  /* ... */
+
+  /* Admin Typography Tokens */
+  --admin-font-primary: var(--font-poppins), "Poppins", sans-serif;
+  --admin-font-size-base: 16px;
+  /* ... */
+}
+
+/* 다크모드 */
+[data-theme="dark"] {
+  --commerce-primary-main: #f3f5f7;
+  --commerce-background-default: #0a0a0a;
+  /* ... */
+}
+```
