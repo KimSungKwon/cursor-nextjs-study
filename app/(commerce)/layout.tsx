@@ -1,8 +1,8 @@
-export default function CommerceLayout({
+const CommerceLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) => {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b px-6 py-4">
@@ -11,4 +11,6 @@ export default function CommerceLayout({
       {children}
     </div>
   );
-}
+};
+
+export default CommerceLayout;

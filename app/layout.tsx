@@ -18,11 +18,11 @@ export const metadata: Metadata = {
   description: "커머스 사용자 영역 및 관리자 대시보드",
 };
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) => {
   return (
     <html
       lang="en"
@@ -33,4 +33,6 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;

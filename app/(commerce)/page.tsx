@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ProductsJsonPreview } from "@/components/commerce/ProductsJsonPreview";
 
-export default function CommerceHomePage() {
+const CommerceHomePage = () => {
   return (
     <main className="flex flex-1 flex-col gap-8 p-6">
       <div className="space-y-2">
@@ -36,4 +36,6 @@ export default function CommerceHomePage() {
       </div>
     </main>
   );
-}
+};
+
+export default CommerceHomePage;

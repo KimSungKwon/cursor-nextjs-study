@@ -3,7 +3,7 @@ type AdminPageHeaderProps = {
   description?: string;
 };
 
-export function AdminPageHeader({ title, description }: AdminPageHeaderProps) {
+export const AdminPageHeader = ({ title, description }: AdminPageHeaderProps) => {
   return (
     <div className="border-b px-6 py-4">
       <h1 className="text-xl font-semibold">{title}</h1>
@@ -12,4 +12,4 @@ export function AdminPageHeader({ title, description }: AdminPageHeaderProps) {
       ) : null}
     </div>
   );
-}
+};

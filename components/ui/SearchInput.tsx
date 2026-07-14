@@ -17,7 +17,7 @@ export interface SearchInputProps
   leftIcon?: ReactNode;
 }
 
-function SearchIcon({ className }: { className?: string }) {
+const SearchIcon = ({ className }: { className?: string }) => {
   return (
     <svg
       className={className}
@@ -36,9 +36,9 @@ function SearchIcon({ className }: { className?: string }) {
       />
     </svg>
   );
-}
+};
 
-export function SearchInput({
+export const SearchInput = ({
   className,
   variant = "commerce",
   onSearch,
@@ -49,7 +49,7 @@ export function SearchInput({
   onKeyDown,
   style,
   ...props
-}: SearchInputProps) {
+}: SearchInputProps) => {
   if (variant === "admin") {
     return (
       <div
@@ -142,4 +142,4 @@ export function SearchInput({
       </Button>
     </div>
   );
-}
+};

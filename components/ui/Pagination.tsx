@@ -16,7 +16,7 @@ export interface PaginationProps {
   "aria-label"?: string;
 }
 
-function ChevronLeft() {
+const ChevronLeft = () => {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
       <path
@@ -28,9 +28,9 @@ function ChevronLeft() {
       />
     </svg>
   );
-}
+};
 
-function ChevronRight() {
+const ChevronRight = () => {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
       <path
@@ -42,19 +42,19 @@ function ChevronRight() {
       />
     </svg>
   );
-}
+};
 
 interface PageButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   active?: boolean;
 }
 
-function PageButton({
+const PageButton = ({
   active,
   className,
   children,
   style,
   ...props
-}: PageButtonProps) {
+}: PageButtonProps) => {
   return (
     <button
       type="button"
@@ -82,7 +82,7 @@ function PageButton({
       {children}
     </button>
   );
-}
+};
 
 function getPageNumbers(page: number, totalPages: number, max = 5): number[] {
   if (totalPages <= max) {
@@ -97,14 +97,14 @@ function getPageNumbers(page: number, totalPages: number, max = 5): number[] {
   return Array.from({ length: end - start + 1 }, (_, index) => start + index);
 }
 
-export function Pagination({
+export const Pagination = ({
   page,
   totalPages,
   variant = "full",
   className,
   onPageChange,
   "aria-label": ariaLabel = "pagination",
-}: PaginationProps) {
+}: PaginationProps) => {
   const canPrev = page > 1;
   const canNext = page < totalPages;
   const pages =
@@ -144,4 +144,4 @@ export function Pagination({
       </PageButton>
     </nav>
   );
-}
+};

@@ -9,7 +9,7 @@ type ReactQueryProviderProps = {
   children: React.ReactNode;
 };
 
-export function ReactQueryProvider({ children }: ReactQueryProviderProps) {
+export const ReactQueryProvider = ({ children }: ReactQueryProviderProps) => {
   const [queryClient] = useState(() => createQueryClient());
 
   return (
@@ -20,4 +20,4 @@ export function ReactQueryProvider({ children }: ReactQueryProviderProps) {
       ) : null}
     </QueryClientProvider>
   );
-}
+};

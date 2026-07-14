@@ -79,7 +79,7 @@ const variantStyle: Record<ButtonVariant, VariantTokenStyle> = {
   },
 };
 
-export function Button({
+export const Button = ({
   className,
   variant = "solid",
   size = "lg",
@@ -91,7 +91,7 @@ export function Button({
   type = "button",
   style,
   ...props
-}: ButtonProps) {
+}: ButtonProps) => {
   const isDisabled = disabled || loading;
   const tokens = variantStyle[variant];
 
@@ -132,4 +132,4 @@ export function Button({
       {!loading && rightIcon}
     </button>
   );
-}
+};

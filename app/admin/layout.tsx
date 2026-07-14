@@ -1,10 +1,10 @@
 import Link from "next/link";
 
-export default function AdminLayout({
+const AdminLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) => {
   return (
     <div className="flex min-h-screen">
       <aside className="w-56 border-r p-4">
@@ -18,4 +18,6 @@ export default function AdminLayout({
       <div className="flex flex-1 flex-col">{children}</div>
     </div>
   );
-}
+};
+
+export default AdminLayout;

@@ -19,7 +19,7 @@ const sizeClass: Record<IconButtonSize, string> = {
   md: "size-8",
 };
 
-export function IconButton({
+export const IconButton = ({
   className,
   variant = "plain",
   size = "md",
@@ -27,7 +27,7 @@ export function IconButton({
   type = "button",
   style,
   ...props
-}: IconButtonProps) {
+}: IconButtonProps) => {
   return (
     <button
       type={type}
@@ -52,4 +52,4 @@ export function IconButton({
       {children}
     </button>
   );
-}
+};

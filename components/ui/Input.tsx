@@ -14,7 +14,7 @@ export interface InputProps
   rightIcon?: ReactNode;
 }
 
-export function Input({
+export const Input = ({
   className,
   id,
   label,
@@ -25,7 +25,7 @@ export function Input({
   disabled,
   style,
   ...props
-}: InputProps) {
+}: InputProps) => {
   const inputId = id ?? props.name;
 
   return (
@@ -112,4 +112,4 @@ export function Input({
       ) : null}
     </div>
   );
-}
+};

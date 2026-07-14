@@ -44,14 +44,14 @@ const sizeStyle: Record<BadgeSize, CSSProperties> = {
   },
 };
 
-export function Badge({
+export const Badge = ({
   className,
   variant = "neutral",
   size = "md",
   children,
   style,
   ...props
-}: BadgeProps) {
+}: BadgeProps) => {
   return (
     <span
       className={cn(
@@ -70,4 +70,4 @@ export function Badge({
       {children}
     </span>
   );
-}
+};

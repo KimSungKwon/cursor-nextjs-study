@@ -4,7 +4,7 @@ type CommerceHeaderProps = {
   title?: string;
 };
 
-export function CommerceHeader({ title = "커머스" }: CommerceHeaderProps) {
+export const CommerceHeader = ({ title = "커머스" }: CommerceHeaderProps) => {
   return (
     <header className="flex items-center justify-between border-b px-6 py-4">
       <h1 className="text-lg font-semibold">{title}</h1>
@@ -14,4 +14,4 @@ export function CommerceHeader({ title = "커머스" }: CommerceHeaderProps) {
       </nav>
     </header>
   );
-}
+};

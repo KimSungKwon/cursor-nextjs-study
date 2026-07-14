@@ -27,7 +27,7 @@ export interface DropdownProps {
   "aria-label"?: string;
 }
 
-function ChevronDown({ className }: { className?: string }) {
+const ChevronDown = ({ className }: { className?: string }) => {
   return (
     <svg
       className={className}
@@ -46,9 +46,9 @@ function ChevronDown({ className }: { className?: string }) {
       />
     </svg>
   );
-}
+};
 
-export function Dropdown({
+export const Dropdown = ({
   options,
   value,
   placeholder = "Filter by date range",
@@ -56,7 +56,7 @@ export function Dropdown({
   className,
   onChange,
   "aria-label": ariaLabel,
-}: DropdownProps) {
+}: DropdownProps) => {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const listboxId = useId();
@@ -143,7 +143,7 @@ export function Dropdown({
       ) : null}
     </div>
   );
-}
+};
 
 interface DropdownOptionButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -151,13 +151,13 @@ interface DropdownOptionButtonProps
   children: ReactNode;
 }
 
-function DropdownOptionButton({
+const DropdownOptionButton = ({
   selected,
   className,
   children,
   style,
   ...props
-}: DropdownOptionButtonProps) {
+}: DropdownOptionButtonProps) => {
   return (
     <button
       type="button"
@@ -177,4 +177,4 @@ function DropdownOptionButton({
       {children}
     </button>
   );
-}
+};

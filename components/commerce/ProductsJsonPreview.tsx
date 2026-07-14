@@ -2,7 +2,7 @@
 
 import { useProductsQuery } from "@/features/products/api/useProductsQuery";
 
-export function ProductsJsonPreview() {
+export const ProductsJsonPreview = () => {
   const { data, isLoading, isError, error } = useProductsQuery({ limit: 20 });
 
   if (isLoading) {
@@ -22,4 +22,4 @@ export function ProductsJsonPreview() {
       {JSON.stringify(data ?? [], null, 2)}
     </pre>
   );
-}
+};

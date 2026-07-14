@@ -16,13 +16,13 @@ const variantStyle: Record<StatusTextVariant, CSSProperties> = {
   pending: { color: commerceColors.semantic.warning },
 };
 
-export function StatusText({
+export const StatusText = ({
   className,
   variant = "active",
   children,
   style,
   ...props
-}: StatusTextProps) {
+}: StatusTextProps) => {
   return (
     <span
       className={cn(className)}
@@ -38,4 +38,4 @@ export function StatusText({
       {children}
     </span>
   );
-}
+};

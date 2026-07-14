@@ -2,9 +2,9 @@ type ProductDetailPageProps = {
   params: Promise<{ productId: string }>;
 };
 
-export default async function ProductDetailPage({
+const ProductDetailPage = async ({
   params,
-}: ProductDetailPageProps) {
+}: ProductDetailPageProps) => {
   const { productId } = await params;
 
   return (
@@ -13,4 +13,6 @@ export default async function ProductDetailPage({
       <p className="text-zinc-600">상품 ID: {productId}</p>
     </main>
   );
-}
+};
+
+export default ProductDetailPage;
