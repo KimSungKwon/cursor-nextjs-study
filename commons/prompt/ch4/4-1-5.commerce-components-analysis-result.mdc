@@ -1,0 +1,263 @@
+---
+alwaysApply: false
+---
+
+# Figma 커머스 컴포넌트 분석 결과
+
+- 소스: E Commerce 컴포넌트 `node-id=310:2620`
+- 분석 도구: TalkToFigma MCP (channel `0ia513zx`)
+- 프로젝트 목표 경로: `components/commerce/*`
+- 기존 코드: `CommerceHeader`, `ProductsJsonPreview`, `types.ts` + `components/ui/*`
+
+---
+
+## 1. Figma 디자인에 있는 컴포넌트 목록
+
+| Figma 이름 | 매핑 대상 | 크기(대략) |
+|------------|-----------|------------|
+| Product Card | ProductCard | 262×433 |
+| Elements/Cart/Product Cell | CartItemRow | 643×144 |
+| Rating/Rating Group | RatingStars | 88×16 (별 16×16 ×5) |
+| user (리뷰 행) | ReviewCard | 1120×156 |
+| Quantity Button small / Quantity Button | QuantitySelector | sm 80×32 / md 127×52 |
+| Elements (Free shipping radio) | OrderSummaryPanel 구성 요소 | 365×52 |
+| Navigation Bar | CommerceHeader 확장 | 1440×60 |
+| Footer | (레이아웃, 이번 범위 외) | 1440×245 |
+| Button / Input / Pagination / Search | `components/ui` (이미 존재) | — |
+| card 5 (ValueCard) | (선택, 이번 7종 외) | ~205×220 |
+| Badges (NEW / -50%) | `Badge` 재사용 | h24 |
+
+> **ProductGrid**: 보드에 단독 프레임 없음 → ProductCard 반복 배치용 컨테이너로 신규 설계  
+> **OrderSummaryPanel**: 단독 프레임 없음 → 배송 라디오(Elements) + 소계/총액 행 조합으로 신규 설계
+
+---
+
+## 2. 기존 vs 신규 vs 확장
+
+### 프로젝트에 만들 7종
+
+- ProductCard: 상품 카드 — 이미지·뱃지·wishlist·Add to cart·별점·가격 (신규) [아래 Props]
+- ProductGrid: 상품 그리드 — ProductCard 목록 레이아웃 (신규) [아래 Props]
+- CartItemRow: 장바구니 아이템 — 썸네일·옵션·수량·단가·합계·Remove (신규) [아래 Props]
+- RatingStars: 별점 — 5개 별 표시 (신규) [아래 Props]
+- ReviewCard: 리뷰 카드 — 아바타·이름·별점·본문 (신규) [아래 Props]
+- QuantitySelector: 수량 선택기 — − / n / + (신규) [아래 Props]
+- OrderSummaryPanel: 주문 요약 패널 — 배송 옵션·소계·총액·CTA (신규) [아래 Props]
+
+### 기존 코드 확장
+
+- CommerceHeader: Navigation Bar 수준으로 확장 (로고·nav·search/user/cart badge) (확장) [`title`, `cartCount`, `onSearchClick` 등]
+- types.ts Product / CartItem: Badge·옵션·할인율 필드 보강 (확장) [`isNew`, `discountRate`, `colorLabel` 등]
+- cart-store CartItem: UI `CartItemRow`와 필드 정합 (`productId` vs `id`, `salePrice` nullability) (확장)
+
+### UI 재사용 (신규 제작 불필요)
+
+- Badge: NEW / -50% (기존)
+- Button: Add to cart, Search, Checkout 등 (기존)
+- IconButton: wishlist heart (기존)
+
+---
+
+## 3. 기존 컴포넌트를 확장해야 하는 부분
+
+| 대상 | 확장 내용 |
+|------|-----------|
+| `CommerceHeader` | Figma Navigation Bar: Poppins 로고, 아이콘 그룹, cart count 뱃지 |
+| `Product` 타입 | `isNew?`, `discountPercent?`, `badgeLabels?` 추가 검토 |
+| `CartItem` 타입/스토어 | UI용 `color`/`optionLabel`, `unitPrice` 표시, `Remove` 콜백 연결 |
+| `Badge` | ProductCard에서 `new` / `sale` variant 그대로 사용 |
+| `Button` | ProductCard hover CTA `size`/`variant` 매핑 (h46, radius 8, solid) |
+
+---
+
+## 4. Props 인터페이스 설계
+
+### ProductCard (신규)
+
+```ts
+interface ProductCardProps {
+  product: Product; // id, name, price, salePrice?, imageUrl, rating?, isLiked?
+  isNew?: boolean;
+  discountPercent?: number; // -50% 뱃지
+  onAddToCart?: (productId: string) => void;
+  onToggleWishlist?: (productId: string) => void;
+  onClick?: (productId: string) => void;
+  className?: string;
+}
+```
+
+### ProductGrid (신규)
+
+```ts
+interface ProductGridProps {
+  products: Product[];
+  columns?: 2 | 3 | 4; // 기본 4 (카드 262폭 기준)
+  gap?: number; // 기본 24
+  isLoading?: boolean;
+  emptyMessage?: string;
+  onAddToCart?: (productId: string) => void;
+  onToggleWishlist?: (productId: string) => void;
+  className?: string;
+}
+```
+
+### CartItemRow (신규)
+
+```ts
+interface CartItemRowProps {
+  item: {
+    productId: string;
+    name: string;
+    imageUrl: string;
+    optionLabel?: string; // "Color: Black"
+    unitPrice: number;
+    quantity: number;
+  };
+  onQuantityChange?: (productId: string, quantity: number) => void;
+  onRemove?: (productId: string) => void;
+  className?: string;
+}
+```
+
+### RatingStars (신규)
+
+```ts
+interface RatingStarsProps {
+  value: number; // 0–5, 소수점 허용 시 floor 표시
+  max?: number; // 기본 5
+  size?: number; // 기본 16
+  readOnly?: boolean; // 기본 true
+  onChange?: (value: number) => void;
+  className?: string;
+}
+```
+
+### ReviewCard (신규)
+
+```ts
+interface ReviewCardProps {
+  authorName: string;
+  avatarUrl?: string;
+  rating: number;
+  body: string;
+  className?: string;
+}
+```
+
+### QuantitySelector (신규)
+
+```ts
+interface QuantitySelectorProps {
+  value: number;
+  min?: number; // 기본 1
+  max?: number;
+  size?: "sm" | "md"; // sm: 80×32(장바구니), md: 127×52(상세)
+  disabled?: boolean;
+  onChange?: (value: number) => void;
+  className?: string;
+}
+```
+
+### OrderSummaryPanel (신규)
+
+```ts
+interface OrderSummaryPanelProps {
+  subtotal: number;
+  shippingOptions?: Array<{
+    id: string;
+    label: string; // "Free shipping"
+    price: number;
+  }>;
+  selectedShippingId?: string;
+  onShippingChange?: (id: string) => void;
+  total: number;
+  ctaLabel?: string; // "Checkout" 등
+  onCheckout?: () => void;
+  className?: string;
+}
+```
+
+---
+
+## 5. 디자인 토큰
+
+토큰 소스: `commons/constants/color.ts`, `commons/constants/typography.ts`
+
+### 색상 (commerce)
+
+| 용도 | 값 | 토큰 |
+|------|-----|------|
+| Primary / CTA / 텍스트 | `#141718` | `commerceColors.primary.main` / `neutral.n07` |
+| Muted 텍스트·옵션 | `#6c7275` | `commerceColors.text.tertiary` |
+| 별 채움 | `#343839` | `commerceColors.primary.light` |
+| Surface / 이미지 배경 | `#f3f5f7` | `commerceColors.background.light` |
+| Divider / cart border | `#e8ecef` | `commerceColors.background.subtle` / `border.light` |
+| Sale 뱃지 | `#38cb89` | `commerceColors.semantic.success` |
+| 배경·카드 | `#ffffff` / `#fefefe` | `background.default` / `paper` |
+| Quantity md 배경 | `#f5f5f5` | (필요 시 surface 추가, 또는 `n02` 근접 사용) |
+
+### 타이포
+
+| 요소 | Font | Size / Weight |
+|------|------|----------------|
+| 상품명 (카드) | Inter | 16 SemiBold / lh 26 |
+| 가격 (카드) | Inter | 14 SemiBold / Regular(취소선) |
+| 장바구니 상품명 | Inter | 14 SemiBold |
+| 옵션·Remove | Inter | 12 Regular / 14 SemiBold muted |
+| 수량 숫자 | Inter | sm 12 / md 16 SemiBold |
+| 리뷰 이름 | Inter | 20 SemiBold |
+| 리뷰 본문 | Inter | 16 Regular / lh 26 (`#353945`) |
+| CTA 버튼 | Inter Medium | 16 |
+
+### 간격·크기
+
+- ProductCard: 262×433, 이미지 262×349, content 72, wishlist 32, badge h24 r4
+- CartItemRow: 높이 144, 썸네일 80×96, 하단 border `#e8ecef`
+- QuantitySelector: sm 80×32 r4 / md 127×52 r8
+- RatingStars: 별 16, 그룹 폭 88
+- ReviewCard: 아바타 72 r48, 전체 1120×156
+- Shipping radio 행: h52, r4, bg `#f3f5f7`, stroke `#141718`(선택 시)
+
+---
+
+## 6. 컴포넌트 상태
+
+| 컴포넌트 | Figma 확인 | 구현 권장 |
+|----------|------------|-----------|
+| ProductCard | default + hover(Add to cart 노출) | loading(skeleton), disabled(품절) |
+| QuantitySelector | default | disabled, min/max 도달 시 −/+ disabled |
+| RatingStars | filled 표시 | readOnly / interactive(focus) |
+| CartItemRow | default | hover(행), removing |
+| ReviewCard | default | — |
+| ProductGrid | (없음) | loading, empty, error |
+| OrderSummaryPanel | radio checked | shipping selected, checkout loading/disabled |
+| Wishlist (카드 내) | default | active(liked) |
+
+---
+
+## 7. 요약 (요청 형식)
+
+- ProductCard: 이미지·NEW/-50%·wishlist·hover Add to cart·별점·이름·할인가 (신규) [`product`, `isNew?`, `discountPercent?`, `onAddToCart?`, `onToggleWishlist?`, `onClick?`]
+- ProductGrid: ProductCard 반응형 그리드 컨테이너 (신규) [`products`, `columns?`, `gap?`, `isLoading?`, `emptyMessage?`, `onAddToCart?`, `onToggleWishlist?`]
+- CartItemRow: 썸네일·이름·옵션·Remove·수량·단가·합계 (신규) [`item`, `onQuantityChange?`, `onRemove?`]
+- RatingStars: 16px 별 5개 그룹 (신규) [`value`, `max?`, `size?`, `readOnly?`, `onChange?`]
+- ReviewCard: 아바타·이름·별점·본문 (신규) [`authorName`, `avatarUrl?`, `rating`, `body`]
+- QuantitySelector: − / n / + (sm·md) (신규) [`value`, `min?`, `max?`, `size?`, `disabled?`, `onChange?`]
+- OrderSummaryPanel: 배송 라디오 + 금액 요약 + CTA (신규) [`subtotal`, `shippingOptions?`, `selectedShippingId?`, `onShippingChange?`, `total`, `ctaLabel?`, `onCheckout?`]
+- CommerceHeader: Figma Navigation Bar 수준 UI (확장) [`title?`, `cartCount?`, nav/icon 핸들러]
+- types.ts / cart-store: 카드·장바구니 UI 필드 정합 (확장) [`isNew`, `discountPercent`, `optionLabel` 등]
+
+---
+
+## 8. 구현 우선순위
+
+1. RatingStars (의존성 최소)
+2. QuantitySelector
+3. ProductCard (Badge + RatingStars + Button 재사용)
+4. ProductGrid
+5. CartItemRow
+6. OrderSummaryPanel
+7. ReviewCard
+8. CommerceHeader 확장 (선택)
+
+의존: `components/ui`의 Button, Badge, IconButton + `commerceColors` / `commerceTypography`
