@@ -1,0 +1,212 @@
+---
+alwaysApply: false
+---
+
+# Figma 홈 화면(Homepage 01) UI 분석 결과
+
+- 소스: Homepage 01 `node-id=3:677`
+- 프레임: 1440 × 3169
+- 분석 도구: TalkToFigma WebSocket (channel `4vji1djp`)
+- 프로젝트 목표: 커머스 홈 (`app/(commerce)/page.tsx`) 레이아웃
+
+---
+
+## 1. 전체 구조 (Header / Main / Footer)
+
+위에서 아래 섹션 순서:
+
+| 순서 | 이름 | node-id | 크기 | 역할 |
+|------|------|---------|------|------|
+| 1 | Navigation Bar | `13:699` | 1440 × 60 | Header |
+| 2 | Product Carousel (master) | `9:683` | 1440 × 573 | Main — 섹션 타이틀 “All” + 상품 4열 |
+| 3 | Product Carousel | `232:2994` | 1440 × 481 | Main — 동일 패턴 반복 |
+| 4 | Product Carousel | `232:3438` | 1440 × 481 | Main — 동일 패턴 반복 |
+| 5 | Product Carousel | `232:3558` | 1440 × 481 | Main — 동일 패턴 반복 |
+| 6 | Values | `7:17079` | 1440 × 316 | Main — 가치 제안 4카드 |
+| 7 | Banner | `7:17075` | 1440 × 532 | Main — 프로모/히어로형 배너 |
+| 8 | Footer | `6:16707` | 1440 × 245 | Footer |
+
+레이아웃 골격:
+
+```
+Homepage 01 (1440)
+├── Header: Navigation Bar (h60)
+├── Main
+│   ├── ProductSection × 4 (타이틀 + ProductCard 4열)
+│   ├── Values (ValueCard 4열)
+│   └── Banner (이미지 50% + 카피 50%)
+└── Footer (다크 배경)
+```
+
+> 상단 풀블리드 히어로는 없고, **배너가 하단(Values 아래)**에 위치합니다.
+
+---
+
+## 2. 상품 리스트 그리드
+
+Product Carousel 내부 `product card` 프레임:
+
+| 항목 | 값 |
+|------|-----|
+| 카드 컨테이너 폭 | 1280 |
+| 카드 크기 | 262 × 433 |
+| 열 개수 | **4** |
+| 카드 X 좌표 간격 | 286 (`-2650` → `-2364` → `-2078` → `-1792`) |
+| **갭(gap)** | **24** (286 − 262) |
+| 프레임 좌측 inset | 160 (콘텐츠 시작 −2650, 프레임 −2810) |
+| 좌우 합 | (1440 − 1280) / 2 = **80** … 단, 실제 좌측 160 / 우측 0에 가깝게 배치되어 **좌우 비대칭 padding** 가능. 구현 시 콘텐츠 max-width 1120~1280 + 중앙 정렬 권장 |
+
+첫 번째 Carousel만 높이 573(타이틀 영역·상단 여백 포함), 이후 인스턴스는 481.
+
+섹션 타이틀:
+
+- 텍스트: `All` (Figma상 카테고리 라벨 — 구현 시 props로 섹션명 교체)
+- Poppins Medium 40 / lh 44 / `#000000`
+
+카드 내 요소(기존 `ProductCard`와 정합):
+
+- 이미지 영역 262 × 349
+- Badge: NEW / -50%
+- Wishlist(하트) 32×32
+- Hover CTA: Add to cart (Inter Medium 16, bg `#141718`, radius 8, h46)
+- 상품명 Inter SemiBold 16 / 가격 Inter 14
+
+---
+
+## 3. Header (Navigation Bar)
+
+Homepage 01의 Navigation Bar 인스턴스(`13:699`) 실제 구성:
+
+| 요소 | 내용 | 스펙 |
+|------|------|------|
+| Logo | `Cursor Commerce` | Poppins Medium 24 / `#000000` |
+| Search | 검색 아이콘 | 24×24 |
+| Account | user-circle | 24×24 |
+| Cart | shopping bag + badge `2` | badge bg `#141718`, 텍스트 Inter Bold 12 / `#ffffff` |
+| Bar | 배경 `#ffffff` | 1440 × 60 |
+
+아이콘 그룹 폭 ≈ 130, 우측 정렬.
+
+> **검증 메모 (2026-07-15):** 레이어에 `Elements/Navigation/Link Group` 프레임은 있으나 Homepage 인스턴스에서는 **자식 링크가 비어 있음** (`children: []`). 화면상 가운데 Home/Shop/Product/Contact Us **내비 링크는 노출되지 않음**. 이전 분석에서 Nav links를 본문으로 적은 것은 오류.
+
+---
+
+## 4. Footer
+
+배경: `#141718` (commerce primary)
+
+| 영역 | 내용 |
+|------|------|
+| 상단 링크 | Home · Mypage · Contact Us (Inter Regular 14 / `#fefefe`) |
+| 카피라이트 | `Copyright © 2026 Cursor Commerce. All rights reserved` (Poppins 12 / `#e8ecef`) |
+| 법적 링크 | Privacy Policy · Terms of Use (Poppins SemiBold 12 / `#fefefe`) |
+
+크기: 1440 × 245. 콘텐츠 폭 ≈ 1120.
+
+---
+
+## 5. 배너 / 히어로
+
+단일 `Banner` 컴포넌트 (풀폭 1440 × 532), 50:50 스plit:
+
+| 영역 | 크기 | 내용 |
+|------|------|------|
+| Image Placeholder | 720 × 532 | 좌측 이미지 |
+| Content | 720 × 532 | 배경 `#f3f5f7` |
+
+카피:
+
+- Eyebrow: `SALE UP TO 35% OFF` — Inter Bold 16 / `#377dff` (semantic info)
+- Title: `HUNDREDS of New lower prices!` — Poppins Medium 40 / lh44 / `#141718`
+- Body: 방 꾸밈 관련 설명 — Inter Regular 20 / lh32 / `#141718`
+- CTA: `Shop Now` — Inter Medium 16 / `#141718` (텍스트 링크/언더라인형)
+
+---
+
+## 6. Values 섹션
+
+4열 Value 카드 (262 × 220, bg `#f3f5f7`, 갭 24 — 상품 그리드와 동일):
+
+| 카드 | 제목 | 설명 | 아이콘 힌트 |
+|------|------|------|-------------|
+| 1 | Free Shipping | Order above $200 | fast delivery |
+| 2 | Money-back | 30 days guarantee | money |
+| 3 | Secure Payments | Secured by Stripe | lock |
+| 4 | 24/7 Support | Phone and Email support | call |
+
+타이포: 제목 Poppins Medium 20, 설명 Poppins Regular 14 / `#6c7275`. 아이콘 48×48.
+
+---
+
+## 7. 디자인 토큰 매핑
+
+기존 `commerceColors` / `commerceTypography` / `--commerce-*`와 일치:
+
+| 용도 | Figma | 토큰 |
+|------|-------|------|
+| Primary / Footer bg | `#141718` | `commerceColors.primary.main` |
+| Muted text | `#6c7275` | `commerceColors.text.tertiary` |
+| Surface | `#f3f5f7` | `commerceColors.background.light` |
+| Inverse text | `#fefefe` | `commerceColors.text.inverse` |
+| Info / Sale label | `#377dff` | `commerceColors.semantic.info` |
+| Heading | Poppins | `commerceTypography.fontFamily.heading` |
+| Body / CTA | Inter | `commerceTypography.fontFamily.body` |
+| Section title 40 | — | `commerceTypography.headline.h4` |
+
+> Homepage Header에는 내비 텍스트가 없어 Space Grotesk nav 토큰은 Footer/기타에만 해당될 수 있음.
+
+간격 요약:
+
+- 페이지 폭 1440 (데스크탑)
+- 그리드 gap **24**
+- 카드 262
+- Header 60 / Footer 245
+- Banner 532 / Values 카드 220
+
+---
+
+## 8. 제안 컴포넌트 구조
+
+### 기존 재사용
+
+| 컴포넌트 | 경로 | 홈에서의 역할 |
+|----------|------|----------------|
+| CommerceHeader / LayoutHeader | `components/commerce/layout/LayoutHeader.tsx` | Navigation Bar (로고 + search/user/cart) |
+| ProductCard | `components/commerce/ProductCard` | 캐러셀/그리드 카드 |
+| ProductGrid | `components/commerce/ProductGrid` | columns=4, gap=24 |
+| Badge / Button / IconButton | `components/ui/*` | NEW/-50%, Add to cart, wishlist |
+
+### 신규 / 확장
+
+| 컴포넌트 | 판정 | Props 초안 |
+|----------|------|------------|
+| CommerceLayout (또는 page 조합) | 신규·페이지 조합 | `children` — Header/Footer 슬롯 |
+| CommerceFooter | **신규** | `links?`, `legalLinks?`, `copyright?` |
+| ProductSection | **신규** | `title`, `products`, `columns?`, `onAddToCart?` — Title + ProductGrid |
+| ValueCard / ValuesSection | **신규** | `items: { icon, title, description }[]` |
+| HomeBanner / PromoBanner | **신규** | `eyebrow`, `title`, `description`, `ctaLabel`, `ctaHref`, `imageUrl` |
+
+### 페이지 조립 (`app/(commerce)/page.tsx`)
+
+```
+LayoutHeader          ← 로고 + 검색/유저/장바구니 (내비 텍스트 링크 없음)
+ProductSection title="All" × N   ← useProductsQuery 데이터 슬라이스/카테고리
+ValuesSection
+HomeBanner
+CommerceFooter
+```
+
+### 구현 우선순위
+
+1. LayoutHeader (로고 + 아이콘 + cart badge, Figma Homepage 헤더와 동일)
+2. ProductSection (ProductGrid 래핑 + 섹션 타이틀)
+3. ValuesSection + ValueCard
+4. HomeBanner
+5. CommerceFooter
+6. `(commerce)/page.tsx`에서 섹션 조립 + 실데이터 연동
+
+### 의존
+
+- 토큰: `--commerce-*` / `commerceColors` / `commerceTypography`
+- URL: `COMMERCE_URLS`, `getProductDetailUrl`
+- 타입: `components/commerce/types.ts`의 `Product`

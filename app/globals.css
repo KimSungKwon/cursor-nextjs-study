@@ -72,236 +72,237 @@
   --admin-grey-800: #0b0d0d;
   --admin-grey-900: #080a0a;
 
-  /* Commerce Typography Tokens */
-  --commerce-font-family-heading: "Poppins", sans-serif;
-  --commerce-font-family-body: "Inter", sans-serif;
-  --commerce-font-family-navigation: "Space Grotesk", sans-serif;
+  /* Commerce Typography Tokens (next/font: --font-poppins / --font-inter / --font-space-grotesk) */
+  --commerce-font-family-heading: var(--font-poppins, "Poppins"), "Poppins", sans-serif;
+  --commerce-font-family-body: var(--font-inter, "Inter"), "Inter", sans-serif;
+  --commerce-font-family-navigation: var(--font-space-grotesk, "Space Grotesk"),
+    "Space Grotesk", sans-serif;
 
   --commerce-font-weight-regular: 400;
   --commerce-font-weight-medium: 500;
   --commerce-font-weight-semibold: 600;
   --commerce-font-weight-bold: 700;
 
-  --commerce-hero-font-family: "Poppins", sans-serif;
+  --commerce-hero-font-family: var(--commerce-font-family-heading);
   --commerce-hero-font-size: 96px;
   --commerce-hero-font-weight: 500;
   --commerce-hero-line-height: 110%;
 
-  --commerce-headline-h1-font-family: "Poppins", sans-serif;
+  --commerce-headline-h1-font-family: var(--commerce-font-family-heading);
   --commerce-headline-h1-font-size: 80px;
   --commerce-headline-h1-font-weight: 500;
   --commerce-headline-h1-line-height: 110%;
 
-  --commerce-headline-h2-font-family: "Poppins", sans-serif;
+  --commerce-headline-h2-font-family: var(--commerce-font-family-heading);
   --commerce-headline-h2-font-size: 72px;
   --commerce-headline-h2-font-weight: 500;
   --commerce-headline-h2-line-height: 110%;
 
-  --commerce-headline-h3-font-family: "Poppins", sans-serif;
+  --commerce-headline-h3-font-family: var(--commerce-font-family-heading);
   --commerce-headline-h3-font-size: 54px;
   --commerce-headline-h3-font-weight: 500;
   --commerce-headline-h3-line-height: 110%;
 
-  --commerce-headline-h4-font-family: "Poppins", sans-serif;
+  --commerce-headline-h4-font-family: var(--commerce-font-family-heading);
   --commerce-headline-h4-font-size: 40px;
   --commerce-headline-h4-font-weight: 500;
   --commerce-headline-h4-line-height: 110%;
 
-  --commerce-headline-h5-font-family: "Poppins", sans-serif;
+  --commerce-headline-h5-font-family: var(--commerce-font-family-heading);
   --commerce-headline-h5-font-size: 34px;
   --commerce-headline-h5-font-weight: 500;
   --commerce-headline-h5-line-height: 120%;
 
-  --commerce-headline-h6-font-family: "Poppins", sans-serif;
+  --commerce-headline-h6-font-family: var(--commerce-font-family-heading);
   --commerce-headline-h6-font-size: 28px;
   --commerce-headline-h6-font-weight: 500;
   --commerce-headline-h6-line-height: 120%;
 
-  --commerce-headline-h7-font-family: "Poppins", sans-serif;
+  --commerce-headline-h7-font-family: var(--commerce-font-family-heading);
   --commerce-headline-h7-font-size: 20px;
   --commerce-headline-h7-font-weight: 500;
   --commerce-headline-h7-line-height: 120%;
 
-  --commerce-body-lg-regular-font-family: "Inter", sans-serif;
+  --commerce-body-lg-regular-font-family: var(--commerce-font-family-body);
   --commerce-body-lg-regular-font-size: 20px;
   --commerce-body-lg-regular-font-weight: 400;
   --commerce-body-lg-regular-line-height: 160%;
 
-  --commerce-body-lg-semibold-font-family: "Inter", sans-serif;
+  --commerce-body-lg-semibold-font-family: var(--commerce-font-family-body);
   --commerce-body-lg-semibold-font-size: 20px;
   --commerce-body-lg-semibold-font-weight: 600;
   --commerce-body-lg-semibold-line-height: 160%;
 
-  --commerce-body-lg-bold-font-family: "Inter", sans-serif;
+  --commerce-body-lg-bold-font-family: var(--commerce-font-family-body);
   --commerce-body-lg-bold-font-size: 20px;
   --commerce-body-lg-bold-font-weight: 700;
   --commerce-body-lg-bold-line-height: 160%;
 
-  --commerce-body-md-regular-font-family: "Inter", sans-serif;
+  --commerce-body-md-regular-font-family: var(--commerce-font-family-body);
   --commerce-body-md-regular-font-size: 16px;
   --commerce-body-md-regular-font-weight: 400;
   --commerce-body-md-regular-line-height: 175%;
 
-  --commerce-body-md-semibold-font-family: "Inter", sans-serif;
+  --commerce-body-md-semibold-font-family: var(--commerce-font-family-body);
   --commerce-body-md-semibold-font-size: 16px;
   --commerce-body-md-semibold-font-weight: 600;
   --commerce-body-md-semibold-line-height: 175%;
 
-  --commerce-body-md-bold-font-family: "Inter", sans-serif;
+  --commerce-body-md-bold-font-family: var(--commerce-font-family-body);
   --commerce-body-md-bold-font-size: 16px;
   --commerce-body-md-bold-font-weight: 700;
   --commerce-body-md-bold-line-height: 175%;
 
-  --commerce-caption-md-regular-font-family: "Inter", sans-serif;
+  --commerce-caption-md-regular-font-family: var(--commerce-font-family-body);
   --commerce-caption-md-regular-font-size: 14px;
   --commerce-caption-md-regular-font-weight: 400;
   --commerce-caption-md-regular-line-height: 140%;
 
-  --commerce-caption-md-semibold-font-family: "Inter", sans-serif;
+  --commerce-caption-md-semibold-font-family: var(--commerce-font-family-body);
   --commerce-caption-md-semibold-font-size: 14px;
   --commerce-caption-md-semibold-font-weight: 600;
   --commerce-caption-md-semibold-line-height: 140%;
 
-  --commerce-caption-md-bold-font-family: "Inter", sans-serif;
+  --commerce-caption-md-bold-font-family: var(--commerce-font-family-body);
   --commerce-caption-md-bold-font-size: 14px;
   --commerce-caption-md-bold-font-weight: 700;
   --commerce-caption-md-bold-line-height: 140%;
 
-  --commerce-caption-sm-regular-font-family: "Inter", sans-serif;
+  --commerce-caption-sm-regular-font-family: var(--commerce-font-family-body);
   --commerce-caption-sm-regular-font-size: 12px;
   --commerce-caption-sm-regular-font-weight: 400;
   --commerce-caption-sm-regular-line-height: 140%;
 
-  --commerce-caption-sm-semibold-font-family: "Inter", sans-serif;
+  --commerce-caption-sm-semibold-font-family: var(--commerce-font-family-body);
   --commerce-caption-sm-semibold-font-size: 12px;
   --commerce-caption-sm-semibold-font-weight: 600;
   --commerce-caption-sm-semibold-line-height: 140%;
 
-  --commerce-caption-sm-bold-font-family: "Inter", sans-serif;
+  --commerce-caption-sm-bold-font-family: var(--commerce-font-family-body);
   --commerce-caption-sm-bold-font-size: 12px;
   --commerce-caption-sm-bold-font-weight: 700;
   --commerce-caption-sm-bold-line-height: 140%;
 
-  --commerce-button-xl-font-family: "Inter", sans-serif;
+  --commerce-button-xl-font-family: var(--commerce-font-family-body);
   --commerce-button-xl-font-size: 26px;
   --commerce-button-xl-font-weight: 500;
   --commerce-button-xl-line-height: 120%;
 
-  --commerce-button-lg-font-family: "Inter", sans-serif;
+  --commerce-button-lg-font-family: var(--commerce-font-family-body);
   --commerce-button-lg-font-size: 22px;
   --commerce-button-lg-font-weight: 500;
   --commerce-button-lg-line-height: 120%;
 
-  --commerce-button-md-font-family: "Inter", sans-serif;
+  --commerce-button-md-font-family: var(--commerce-font-family-body);
   --commerce-button-md-font-size: 18px;
   --commerce-button-md-font-weight: 500;
   --commerce-button-md-line-height: 120%;
 
-  --commerce-button-sm-font-family: "Inter", sans-serif;
+  --commerce-button-sm-font-family: var(--commerce-font-family-body);
   --commerce-button-sm-font-size: 16px;
   --commerce-button-sm-font-weight: 500;
   --commerce-button-sm-line-height: 175%;
 
-  --commerce-button-xs-font-family: "Inter", sans-serif;
+  --commerce-button-xs-font-family: var(--commerce-font-family-body);
   --commerce-button-xs-font-size: 14px;
   --commerce-button-xs-font-weight: 500;
   --commerce-button-xs-line-height: 140%;
 
-  --commerce-navigation-link-font-family: "Space Grotesk", sans-serif;
+  --commerce-navigation-link-font-family: var(--commerce-font-family-navigation);
   --commerce-navigation-link-font-size: 14px;
   --commerce-navigation-link-font-weight: 500;
   --commerce-navigation-link-line-height: 24px;
 
-  --commerce-navigation-logo-font-family: "Poppins", sans-serif;
+  --commerce-navigation-logo-font-family: var(--commerce-font-family-heading);
   --commerce-navigation-logo-font-size: 24px;
   --commerce-navigation-logo-font-weight: 500;
   --commerce-navigation-logo-line-height: 24px;
 
   /* Admin Typography Tokens */
-  --admin-font-family-heading: "Inter", sans-serif;
-  --admin-font-family-body: "Inter", sans-serif;
+  --admin-font-family-heading: var(--font-inter, "Inter"), "Inter", sans-serif;
+  --admin-font-family-body: var(--font-inter, "Inter"), "Inter", sans-serif;
 
   --admin-font-weight-regular: 400;
   --admin-font-weight-medium: 500;
   --admin-font-weight-semibold: 600;
   --admin-font-weight-bold: 700;
 
-  --admin-heading-h1-font-family: "Inter", sans-serif;
+  --admin-heading-h1-font-family: var(--admin-font-family-body);
   --admin-heading-h1-font-size: 24px;
   --admin-heading-h1-font-weight: 600;
   --admin-heading-h1-line-height: 130%;
 
-  --admin-heading-h2-font-family: "Inter", sans-serif;
+  --admin-heading-h2-font-family: var(--admin-font-family-body);
   --admin-heading-h2-font-size: 18px;
   --admin-heading-h2-font-weight: 600;
   --admin-heading-h2-line-height: 130%;
 
-  --admin-heading-h3-font-family: "Inter", sans-serif;
+  --admin-heading-h3-font-family: var(--admin-font-family-body);
   --admin-heading-h3-font-size: 15px;
   --admin-heading-h3-font-weight: 600;
   --admin-heading-h3-line-height: 130%;
 
-  --admin-heading-h4-font-family: "Inter", sans-serif;
+  --admin-heading-h4-font-family: var(--admin-font-family-body);
   --admin-heading-h4-font-size: 14px;
   --admin-heading-h4-font-weight: 600;
   --admin-heading-h4-line-height: 130%;
 
-  --admin-body-lg-font-family: "Inter", sans-serif;
+  --admin-body-lg-font-family: var(--admin-font-family-body);
   --admin-body-lg-font-size: 16px;
   --admin-body-lg-font-weight: 400;
   --admin-body-lg-line-height: 150%;
 
-  --admin-body-md-font-family: "Inter", sans-serif;
+  --admin-body-md-font-family: var(--admin-font-family-body);
   --admin-body-md-font-size: 14px;
   --admin-body-md-font-weight: 400;
   --admin-body-md-line-height: 150%;
 
-  --admin-body-sm-font-family: "Inter", sans-serif;
+  --admin-body-sm-font-family: var(--admin-font-family-body);
   --admin-body-sm-font-size: 13px;
   --admin-body-sm-font-weight: 400;
   --admin-body-sm-line-height: 150%;
 
-  --admin-body-xs-font-family: "Inter", sans-serif;
+  --admin-body-xs-font-family: var(--admin-font-family-body);
   --admin-body-xs-font-size: 12px;
   --admin-body-xs-font-weight: 400;
   --admin-body-xs-line-height: 150%;
 
-  --admin-label-md-font-family: "Inter", sans-serif;
+  --admin-label-md-font-family: var(--admin-font-family-body);
   --admin-label-md-font-size: 14px;
   --admin-label-md-font-weight: 500;
   --admin-label-md-line-height: 140%;
 
-  --admin-label-sm-font-family: "Inter", sans-serif;
+  --admin-label-sm-font-family: var(--admin-font-family-body);
   --admin-label-sm-font-size: 12px;
   --admin-label-sm-font-weight: 500;
   --admin-label-sm-line-height: 140%;
 
-  --admin-button-lg-font-family: "Inter", sans-serif;
+  --admin-button-lg-font-family: var(--admin-font-family-body);
   --admin-button-lg-font-size: 15px;
   --admin-button-lg-font-weight: 500;
   --admin-button-lg-line-height: 120%;
 
-  --admin-button-md-font-family: "Inter", sans-serif;
+  --admin-button-md-font-family: var(--admin-font-family-body);
   --admin-button-md-font-size: 14px;
   --admin-button-md-font-weight: 500;
   --admin-button-md-line-height: 120%;
 
-  --admin-button-sm-font-family: "Inter", sans-serif;
+  --admin-button-sm-font-family: var(--admin-font-family-body);
   --admin-button-sm-font-size: 13px;
   --admin-button-sm-font-weight: 500;
   --admin-button-sm-line-height: 120%;
 
-  --admin-table-header-font-family: "Inter", sans-serif;
+  --admin-table-header-font-family: var(--admin-font-family-body);
   --admin-table-header-font-size: 12px;
   --admin-table-header-font-weight: 600;
   --admin-table-header-line-height: 140%;
 
-  --admin-table-cell-font-family: "Inter", sans-serif;
+  --admin-table-cell-font-family: var(--admin-font-family-body);
   --admin-table-cell-font-size: 14px;
   --admin-table-cell-font-weight: 400;
   --admin-table-cell-line-height: 140%;
 
-  --admin-link-font-family: "Inter", sans-serif;
+  --admin-link-font-family: var(--admin-font-family-body);
   --admin-link-font-size: 11px;
   --admin-link-font-weight: 400;
   --admin-link-line-height: 140%;

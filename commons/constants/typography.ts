@@ -1,8 +1,10 @@
 // Figma Text Styles (E Commerce 템플릿) 기반 타이포그래피 토큰
+// next/font 변수(--font-poppins 등)와 globals.css 토큰을 함께 사용
 
-const poppins = "Poppins, sans-serif";
-const inter = "Inter, sans-serif";
-const spaceGrotesk = "Space Grotesk, sans-serif";
+const poppins = 'var(--font-poppins, "Poppins"), "Poppins", sans-serif';
+const inter = 'var(--font-inter, "Inter"), "Inter", sans-serif';
+const spaceGrotesk =
+  'var(--font-space-grotesk, "Space Grotesk"), "Space Grotesk", sans-serif';
 
 export const commerceTypography = {
   fontFamily: {
