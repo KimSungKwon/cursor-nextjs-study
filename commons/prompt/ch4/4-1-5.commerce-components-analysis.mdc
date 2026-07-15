@@ -1,3 +1,28 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+이 Figma 디자인 파일을 분석해서 
+커머스 서비스에 필요한 컴포넌트를 추출해줘.
+
+커머스 컴포넌트: 
+https://www.figma.com/design/PrPYG8hrEWB6IMFit7gol5/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=310-2620&t=Fd2iho1x8fX8spns-4
+
+현재 프로젝트에서 만들 커머스 컴포넌트:
+- components/commerce/ProductCard: 상품 카드
+- components/commerce/ProductGrid: 상품 그리드
+- components/commerce/CartItemRow: 장바구니 아이템
+- components/commerce/RatingStars: 별점
+- components/commerce/ReviewCard: 리뷰 카드
+- components/commerce/QuantitySelector: 수량 선택기
+- components/commerce/OrderSummaryPanel: 주문 요약 패널
+
+다음 정보를 추출해줘:
+1. Figma 디자인에 있는 컴포넌트 목록
+2. 기존 컴포넌트와 비교하여 새로 필요한 컴포넌트
+3. 기존 컴포넌트를 확장해야 하는 부분
+4. 각 컴포넌트의 Props 인터페이스 설계
+5. 사용되는 디자인 토큰 (색상, 타이포그래피, 간격)
+6. 컴포넌트의 상태 (default, hover, focus, disabled, loading 등)
+
+결과를 다음과 같은 형식으로 정리해줘:
+- 컴포넌트명: 설명 (기존/신규/확장) [필요한 Props]"

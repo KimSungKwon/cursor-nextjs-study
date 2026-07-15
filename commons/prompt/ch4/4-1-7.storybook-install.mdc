@@ -1,3 +1,31 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+현재 프로젝트에 Storybook 8.6.14 버전을 설치해줘.
+
+프로젝트 정보:
+- 프레임워크: Next.js 16 (App Router)
+- 언어: TypeScript
+- 스타일링: Tailwind CSS
+- 패키지 매니저: yarn
+
+설치할 패키지:
+- storybook: 8.6.14
+- @storybook/react: 8.6.14
+- @storybook/nextjs: 8.6.14
+- @storybook/addon-essentials: 8.6.14
+- @storybook/addon-interactions: 8.6.14
+- @storybook/addon-links: 8.6.14
+- @storybook/test: 8.6.14
+- @storybook/theming: 8.6.14
+
+요구사항:
+1. yarn add -D로 devDependencies에 설치
+2. .storybook 폴더 생성 및 설정 파일 작성
+3. main.ts, preview.ts 설정 파일 생성
+4. Next.js App Router와 Tailwind CSS 연동 설정
+5. package.json에 storybook, build-storybook 스크립트 추가
+
+설정 파일 구조:
+- .storybook/main.ts: Storybook 메인 설정
+- .storybook/preview.ts: 전역 설정 및 데코레이터

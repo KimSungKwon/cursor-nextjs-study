@@ -1,3 +1,82 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+@03-migration.mdc를 참고해서
+Supabase PostgreSQL 데이터베이스에 Row Level Security(RLS)를 활성화하고 
+정책을 설정하는 SQL 마이그레이션 파일을 작성해주세요.
+
+## 요구사항
+1. 모든 주요 테이블에 RLS 활성화
+2. 최소 권한 원칙에 따라 정책 설계
+3. 역할 기반 접근 제어 (일반 사용자, admin)
+4. 소유권 기반 접근 제어 (사용자는 자신의 데이터만 접근)
+
+## RLS 활성화 대상 테이블
+- public.users
+- public.products
+- public.orders
+- public.order_items
+- public.payments
+- public.reviews
+- public.cart_items
+- public.like_items
+- public.mcp_settings
+
+## 정책 설계 원칙
+1. SELECT Policy: 각 테이블마다 최소 1개 이상의 SELECT policy 정의
+2. INSERT Policy: 해당 row의 소유자 또는 admin만 허용
+3. UPDATE Policy: 해당 row의 소유자 또는 admin만 허용
+4. DELETE Policy: 해당 row의 소유자 또는 admin만 허용
+
+## 역할 판별 방식
+- auth.uid()로 현재 로그인한 유저 ID를 얻음
+- public.users 테이블에서 id = auth.uid()인 row를 찾아 role을 판별
+- admin 판별 예시:
+  EXISTS (
+    SELECT 1 FROM public.users u
+    WHERE u.id = auth.uid()
+      AND u.role IN ('admin')
+  )
+  
+## 각 테이블별 정책 요구사항
+
+### 1. public.users
+- SELECT: 로그인한 일반 유저는 자신의 profile만 조회, admin은 전체 조회
+- INSERT: 로그인한 사용자가 자기 id로만 insert 가능
+- UPDATE: 일반 유저는 자신의 profile만 수정 가능 (role 수정 불가), admin은 전체 수정 가능
+- DELETE: admin만 허용
+
+### 2. public.products
+- SELECT: 비로그인/로그인 모두 status != 'hidden'인 상품 읽기 가능, admin은 전체 읽기
+- INSERT/UPDATE/DELETE: admin만 허용
+
+### 3. public.orders
+- SELECT: 로그인 유저는 자신의 주문만 조회, admin은 전체 조회
+- INSERT: 로그인 유저만 가능하며, user_id = auth.uid()인 row만 insert 허용
+- UPDATE: admin만 허용 (주문 상태 변경은 관리자 전용)
+- DELETE: admin만 허용
+
+### 4. public.order_items
+- SELECT: 해당 order가 본인 소유이거나 admin인 경우만 허용
+- INSERT/UPDATE/DELETE: 해당 order가 본인 소유이거나 admin인 경우만 허용
+
+### 5. public.payments
+- SELECT: 해당 order가 본인 소유이거나 admin인 경우만 허용
+- INSERT/UPDATE/DELETE: admin만 허용
+
+### 6. public.reviews
+- SELECT: 로그인 여부와 관계 없이 모든 리뷰 읽기 허용
+- INSERT: 로그인 유저만 가능하며, user_id = auth.uid()인 row만 insert 허용
+- UPDATE: 본인이 작성한 리뷰만 수정 가능
+- DELETE: 본인 또는 admin만 삭제 가능
+
+### 7. public.cart_items
+- SELECT/INSERT/UPDATE/DELETE: 사용자는 자신의 장바구니만 관리 가능
+
+### 8. public.like_items
+- SELECT/INSERT/DELETE: 사용자는 자신의 찜하기만 관리 가능
+
+### 9. public.mcp_settings
+- SELECT/INSERT/UPDATE/DELETE: admin만 허용
+
+출력 형식: SQL 마이그레이션 파일 형식 (supabase/migrations/000X_enable_rls_and_policies.sql)

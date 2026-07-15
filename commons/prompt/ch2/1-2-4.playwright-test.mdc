@@ -1,0 +1,58 @@
+---
+alwaysApply: false
+---
+현재 프로젝트의 컴포넌트들에 Playwright 테스트를 위한 고유 식별자를 추가해줘.
+
+요구사항:
+1. data-testid 속성을 사용하여 테스트 식별자 추가
+2. 명명 규칙: "컴포넌트명-요소타입-용도" 형식 (예: product-card-button-like, order-form-input-contact-name)
+3. 각 컴포넌트별로 추가할 식별자:
+
+ProductCard 컴포넌트 (components/commerce/ProductCard/ProductCard.tsx):
+- 카드 컨테이너: data-testid="product-card"
+- 상품명: data-testid="product-card-name"
+- 가격: data-testid="product-card-price"
+- 할인가: data-testid="product-card-sale-price"
+- 원가: data-testid="product-card-original-price"
+- 할인율 배지: data-testid="product-card-discount-badge"
+- 좋아요 버튼: data-testid="product-card-like-button"
+- 좋아요 아이콘 (채워진 하트): data-testid="product-card-like-icon-filled"
+- 좋아요 아이콘 (빈 하트): data-testid="product-card-like-icon-outline"
+- 카드 링크: data-testid="product-card-link"
+
+ProductDetailClient 컴포넌트 (components/commerce/ProductDetail/ProductDetailClient.tsx):
+- 상품 이미지: data-testid="product-detail-image"
+- 상품명: data-testid="product-detail-name"
+- 가격: data-testid="product-detail-price"
+- 원가: data-testid="product-detail-original-price"
+- 수량 감소 버튼: data-testid="product-detail-quantity-decrease"
+- 수량 증가 버튼: data-testid="product-detail-quantity-increase"
+- 수량 표시: data-testid="product-detail-quantity"
+- 총 금액: data-testid="product-detail-total-price"
+- 장바구니 담기 버튼: data-testid="product-detail-add-to-cart"
+- 바로 주문하기 버튼: data-testid="product-detail-order-button"
+
+OrderForm 컴포넌트 (components/commerce/order/OrderForm.tsx):
+- 모달 컨테이너: data-testid="order-form-modal"
+- 모달 닫기 버튼: data-testid="order-form-close-button"
+- 연락처 이름 입력: data-testid="order-form-contact-name"
+- 연락처 전화번호 입력: data-testid="order-form-contact-phone"
+- 연락처 이메일 입력: data-testid="order-form-contact-email"
+- 수령인 이름 입력: data-testid="order-form-shipping-receiver-name"
+- 수령인 전화번호 입력: data-testid="order-form-shipping-receiver-phone"
+- 주소 입력: data-testid="order-form-shipping-address1"
+- 상세 주소 입력: data-testid="order-form-shipping-address2"
+- 주문 요약 섹션: data-testid="order-form-summary"
+- 주문 요약 상품명: data-testid="order-form-summary-product-name"
+- 주문 요약 수량: data-testid="order-form-summary-quantity"
+- 주문 요약 단가: data-testid="order-form-summary-unit-price"
+- 주문 요약 총 금액: data-testid="order-form-summary-total-price"
+- 에러 메시지: data-testid="order-form-error"
+- 성공 메시지: data-testid="order-form-success"
+- 취소 버튼: data-testid="order-form-cancel-button"
+- 주문 제출하기 버튼: data-testid="order-form-submit-button"
+
+주의사항:
+- 기존 className, id 등 다른 속성은 변경하지 말 것
+- data-testid만 추가할 것
+- 접근성(aria-label 등)은 유지할 것

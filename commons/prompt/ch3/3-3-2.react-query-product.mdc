@@ -1,3 +1,127 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+
+TypeScript로 React Query를 사용하여 Supabase에서 상품 목록을 조회하는 훅을 생성해주세요.
+
+## 요구사항
+
+0. **React-query 기본 세팅**
+
+- commons/libs/react-query.ts : Query Client 기본 설정
+  - staleTime: 60 \* 1000, // 1분
+  - refetchOnWindowFocus: false,
+  - retry: 1
+- app/_providers/ReactQueryProvider.tsx: React Query Provider 설정
+  - NODE_ENV === 'development'인 경우에만 DevTools 활성화
+- 최상위 layout에서 ReactQueryProvider로 감싸서 세팅
+
+1. **파일 경로**
+   - `features/products/api/useProductsQuery.ts`
+
+2. **기존 타입 정의 참고**
+   - `components/commerce/types.ts`에 정의된 `Product` 타입을 재사용
+   - Product 타입:
+     ```typescript
+     export interface Product {
+       id: string;
+       name: string;
+       price: number;
+       salePrice?: number;
+       imageUrl: string;
+       rating?: number;
+       reviewCount?: number;
+     }
+     ```
+
+3. **Supabase 스키마 정보**
+   - 테이블명: `public.products`
+   - 주요 컬럼:
+     - `id`: uuid (PK)
+     - `name`: text (NOT NULL)
+     - `price`: numeric (NOT NULL)
+     - `sale_price`: numeric (NULL 가능)
+     - `image_url`: text (NULL 가능)
+     - `status`: text ('registered' | 'hidden' | 'sold_out')
+     - `rating_average`: numeric (NULL 가능)
+   - 필터 조건: `status != 'hidden'` (hidden 상품 제외)
+
+4. **Query Key**
+   - `QUERY_KEYS.products.list(params || {})` 사용
+   - QUERY_KEYS는 `commons/constants/query-keys.ts`에 정의됨
+
+5. **파라미터 타입**
+   - `UseProductsParams`:
+     ```typescript
+     export type UseProductsParams = {
+       limit?: number;
+       search?: string; // 나중에 확장할 여지를 남김
+     };
+     ```
+
+6. **구현 요구사항**
+   - "use client" 선언
+   - import:
+     - `useQuery` from "@tanstack/react-query"
+     - `getSupabaseBrowserClient` from "@/lib/supabase/client"
+     - `QUERY_KEYS` from "@/commons/constants/query-keys"
+     - `Product` 타입 from "@/components/commerce/types"
+   - queryFn:
+     - `getSupabaseBrowserClient()`로 Supabase 클라이언트 생성
+     - `supabase.from("products").select("*")`로 기본 쿼리 구성
+     - `.neq("status", "hidden")`로 hidden 상품 제외
+     - `params?.limit`가 있으면 `.limit(params.limit)` 적용
+     - search는 TODO 주석으로 남기고 현재는 구현하지 않음
+     - 에러 발생 시 `throw new Error(...)`하여 React Query가 catch하도록
+     - Supabase row를 Product 타입으로 매핑:
+       - `id` → `id`
+       - `name` → `name`
+       - `price` → `price`
+       - `sale_price` → `salePrice` (null이면 undefined)
+       - `image_url` → `imageUrl` (null이면 빈 문자열)
+       - `rating_average` → `rating` (null이면 undefined)
+       - `reviewCount`는 undefined (나중에 별도 조회 필요)
+       
+ 7. **옵션 설정**
+   - `enabled: true`
+   - `staleTime`: 전역 기본 옵션 사용 (1분)
+
+8. **출력 형식**
+   - 반환 타입: `useQuery<Product[]>`
+   - 주요 반환값: `data`, `isLoading`, `isError`, `error`, `refetch`
+   - 주석으로 사용 예시 포함:
+     ```typescript
+     const { data: products, isLoading, isError } = useProductsQuery({ limit: 20 });
+     if (isLoading) return <div>로딩 중...</div>;
+     if (isError) return <div>오류 발생</div>;
+     return <ProductGrid products={products ?? []} />;
+     ```
+
+
+
+## 예시 코드 구조
+
+```typescript
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { QUERY_KEYS } from "@/commons/constants/query-keys";
+import type { Product } from "@/components/commerce/types";
+
+export type UseProductsParams = {
+  limit?: number;
+  search?: string; // 나중에 확장할 여지를 남김
+};
+
+export function useProductsQuery(params?: UseProductsParams) {
+  return useQuery<Product[]>({
+    queryKey: QUERY_KEYS.products.list(params || {}),
+    queryFn: async () => {
+      const supabase = getSupabaseBrowserClient();
+      // ... 구현
+    },
+    enabled: true,
+  });
+}
+```

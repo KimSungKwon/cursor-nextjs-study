@@ -1,3 +1,28 @@
 ---
 alwaysApply: true
 ---
+components/ui/[컴포넌트명].tsx 파일을 위한 
+Storybook 스토리 파일을 생성해줘.
+
+컴포넌트 정보:
+- 파일 경로: components/ui/[컴포넌트명].tsx
+- Props 인터페이스: [컴포넌트 Props 타입 설명]
+
+요구사항:
+1. 파일명: [컴포넌트명].stories.tsx
+2. Meta 설정:
+   - title: "Shared/UI/[컴포넌트명]"
+   - component: [컴포넌트명]
+   - parameters.layout: "centered"
+   - tags: ["autodocs"]
+3. argTypes 설정:
+   - 모든 props를 Controls로 설정
+   - variant는 select 타입
+   - boolean props는 boolean 타입
+   - 이벤트 핸들러는 action 타입
+4. Story 작성:
+   - Default: 기본 상태
+   - 각 variant별 Story (primary, secondary 등)
+   - 각 size별 Story (sm, md, lg 등)
+   - 상태별 Story (loading, disabled, error 등)
+   - 아이콘이 있는 경우 WithIcon Story

@@ -1,3 +1,32 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+@4-1-5.commerce-components-analysis-result 를 기반으로 
+components/commerce/[컴포넌트명]/[컴포넌트명].tsx 파일을 생성해줘.
+
+현재 프로젝트 구조:
+- components/ui: 공통 UI 컴포넌트 (Button, Input, Badge 등)
+- components/commerce: 커머스 전용 컴포넌트
+  - ProductCard: 상품 카드
+  - ProductGrid: 상품 그리드
+  - CartItemRow: 장바구니 아이템
+  - RatingStars: 별점
+  - ReviewCard: 리뷰 카드
+  - QuantitySelector: 수량 선택기
+- commons/constants/color.ts: 색상 토큰 (commerceColors 사용)
+- commons/constants/typography.ts: 타이포그래피 토큰 (commerceTypography 사용)
+- commons/constants/url.ts: URL 상수 (COMMERCE_URLS, getProductDetailUrl 등)
+- components/commerce/types.ts: 커머스 타입 정의 (Product, CartItem 등)
+
+Figma 분석 결과:
+[Figma MCP에서 추출한 컴포넌트 정보]
+
+요구사항:
+1. 기존 커머스 컴포넌트를 먼저 확인하고 재사용 가능하면 재사용
+2. 기존 컴포넌트로 해결 불가능할 때만 새로 생성
+3. components/ui의 공통 컴포넌트를 조합하여 사용
+4. 디자인 토큰 활용 (--commerce-* prefix)
+5. TypeScript로 작성하고 명확한 타입 정의
+6. components/commerce/types.ts의 타입 활용
+7. 접근성 고려 (aria 속성, focus-visible 등)
+8. 기존 컴포넌트 구조와 일관성 유지

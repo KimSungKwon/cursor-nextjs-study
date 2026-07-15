@@ -1,3 +1,61 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+TypeScript로 React Query를 사용하여 Supabase에 주문을 생성하는 Mutation 훅을 생성해주세요.
+
+## 요구사항
+
+1. **파일 경로**
+   - `features/orders/api/useCreateOrderMutation.ts`
+
+2. **Supabase 스키마 정보**
+   - `public.orders` 테이블:
+     - `id`: uuid (PK, 자동 생성)
+     - `user_id`: uuid (FK -> users.id)
+     - `total_amount`: numeric (NOT NULL)
+     - `status`: text ('pending' | 'paid' | 'canceled' | 'refunded')
+     - `payment_status`: text ('requested' | 'success' | 'failed' | ...)
+   - `public.order_items` 테이블:
+     - `id`: uuid (PK, 자동 생성)
+     - `order_id`: uuid (FK -> orders.id)
+     - `product_id`: uuid (FK -> products.id)
+     - `quantity`: integer (NOT NULL)
+     - `unit_price`: numeric (NOT NULL)
+
+3. **입력 타입**
+   ```typescript
+   export type CreateOrderInput = {
+     userId: string;
+     items: Array<{
+       productId: string;
+       quantity: number;
+       unitPrice: number;
+     }>;
+   };
+   ```
+
+4. **출력 타입**
+   ```typescript
+   export type CreateOrderResult = {
+     orderId: string;
+   };
+   ```
+   
+5. **구현 요구사항**
+   - "use client" 선언
+   - import:
+     - `useMutation, useQueryClient` from "@tanstack/react-query"
+     - `getSupabaseBrowserClient` from "@/lib/supabase/client"
+     - `QUERY_KEYS` from "@/commons/constants/query-keys"
+   - mutationFn:
+     - 총액 계산: `items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)`
+     - orders 테이블에 insert (status: 'pending', payment_status: 'requested')
+     - 생성된 order.id를 사용하여 order_items 테이블에 insert
+     - 에러 발생 시 throw하여 React Query가 catch하도록
+   - onSuccess:
+     - `queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders.all })`로 주문 목록 캐시 무효화
+
+6. **출력 형식**
+   - 반환 타입: `useMutation<CreateOrderResult, Error, CreateOrderInput>`
+   - 주요 반환값: `mutate`, `mutateAsync`, `isPending`, `isSuccess`, `isError`, `error`
+   - 주석으로 사용 예시 포함

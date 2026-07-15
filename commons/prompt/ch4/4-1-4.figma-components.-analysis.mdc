@@ -1,0 +1,22 @@
+---
+alwaysApply: false
+---
+
+이 Figma 디자인 파일들을 분석해서 
+공통으로 사용할 수 있는 컴포넌트를 추출해줘.
+
+커머스 컴포넌트: 
+https://www.figma.com/design/PrPYG8hrEWB6IMFit7gol5/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=310-2620&t=Fd2iho1x8fX8spns-4
+
+대시보드 컴포넌트:
+https://www.figma.com/design/PrPYG8hrEWB6IMFit7gol5/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=310-2924&t=Fd2iho1x8fX8spns-4
+
+다음 정보를 추출해줘:
+1. 두 디자인에서 공통으로 사용되는 UI 요소 (버튼, 입력 필드, 배지 등)
+2. 각 컴포넌트의 변형(variant)과 크기(size) 옵션
+3. 사용되는 색상, 폰트, 간격 등 디자인 토큰
+4. 컴포넌트의 상태 (default, hover, focus, disabled, loading 등)
+5. 접근성 고려사항 (aria 속성, 키보드 네비게이션 등)
+
+결과를 다음과 같은 형식으로 정리해줘:
+- 컴포넌트명: 설명 (variant, size, 상태)"

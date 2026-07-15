@@ -1,3 +1,21 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+@4-1-4.figma-components-analysis-result.mdc 를 기반으로 
+components/ui/[컴포넌트명].tsx 파일을 생성해줘.
+
+현재 프로젝트 구조:
+- components/ui: 공통 UI 컴포넌트 (Button, Input, Badge 등)
+- commons/constants/color.ts: 색상 토큰
+- commons/constants/typography.ts: 타이포그래피 토큰
+- commons/constants/url.ts: URL 상수
+
+Figma 분석 결과:
+[Figma MCP에서 추출한 컴포넌트 정보]
+
+요구사항:
+1. TypeScript로 작성하고 명확한 타입 정의
+2. 디자인 토큰(color, typography) 활용
+3. variant, size 등 props로 스타일 커스터마이징 가능
+4. 접근성 고려 (aria 속성, focus-visible 등)
+5. 기존 컴포넌트 구조와 일관성 유지"

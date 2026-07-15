@@ -1,0 +1,136 @@
+---
+alwaysApply: false
+---
+@03-migration.mdc를 참고해서
+Supabase PostgreSQL 데이터베이스에 다음 테이블들을 생성하는 SQL 마이그레이션 파일을 작성해주세요.
+
+## 요구사항
+1. auth.users 테이블과의 연동은 나중에 할 예정이므로, 지금은 auth.users를 참조하지 않는 독립적인 스키마로 작성
+2. 모든 테이블은 public 스키마에 생성
+3. UUID를 기본 키로 사용 (gen_random_uuid() 사용)
+4. 타임스탬프는 timestamp with time zone 사용
+5. CHECK 제약 조건으로 데이터 무결성 보장
+6. 외래 키 제약 조건 명시
+7. 인덱스는 성능 최적화를 위해 필요시 추가
+8. 주석으로 각 테이블과 컬럼의 용도 설명
+
+## 생성할 테이블 목록
+
+### 1. users 테이블
+- id: uuid (PK, 기본값: gen_random_uuid())
+- email: text (UNIQUE, NOT NULL)
+- display_name: text (NULL 가능)
+- role: user_role enum ('user', 'admin') (기본값: 'user')
+- created_at: timestamp with time zone (기본값: now())
+- updated_at: timestamp with time zone (기본값: now())
+- 참고: auth.users와의 연동은 나중에 추가할 예정 (users_auth_fk 제약 조건은 나중에 추가)
+
+### 2. products 테이블
+- id: uuid (PK)
+- name: text (NOT NULL)
+- description: text (NULL 가능)
+- price: numeric (NOT NULL, >= 0)
+- sale_price: numeric (NULL 가능, >= 0)
+- image_url: text (NULL 가능)
+- status: text (NOT NULL, 'registered' | 'hidden' | 'sold_out', 기본값: 'registered')
+- additional_info: text (NULL 가능)
+- measurements: text (NULL 가능)
+- categories: text[] (NULL 가능)
+- rating_average: numeric (NULL 가능)
+- review_summary: jsonb (NULL 가능)
+- created_at: timestamp with time zone (기본값: now())
+- updated_at: timestamp with time zone (기본값: now())
+
+### 3. orders 테이블
+- id: uuid (PK)
+- user_id: uuid (FK -> users.id)
+- status: text (NOT NULL, 'pending' | 'paid' | 'canceled' | 'refunded', 기본값: 'pending')
+- total_amount: numeric (NOT NULL, >= 0, 기본값: 0)
+- subtotal_amount: numeric (NOT NULL, >= 0, 기본값: 0)
+- shipping_fee: numeric (NOT NULL, >= 0, 기본값: 0)
+- discount_amount: numeric (NOT NULL, >= 0, 기본값: 0)
+- currency: text (NOT NULL, 기본값: 'USD')
+- payment_status: text (NOT NULL, 'requested' | 'success' | 'failed' | 'refund_requested' | 'refund_completed', 기본값: 'requested')
+- contact_name: text (NULL 가능)
+- contact_phone: text (NULL 가능)
+- contact_email: text (NULL 가능)
+- shipping_name: text (NULL 가능)
+- shipping_phone: text (NULL 가능)
+- shipping_address_line1: text (NULL 가능)
+- shipping_address_line2: text (NULL 가능)
+- shipping_city: text (NULL 가능)
+- shipping_state: text (NULL 가능)
+- shipping_zip: text (NULL 가능)
+- shipping_country: text (NULL 가능)
+- toss_order_id: text (NULL 가능)
+- created_at: timestamp with time zone (기본값: now())
+- updated_at: timestamp with time zone (기본값: now())
+- paid_at: timestamp with time zone (NULL 가능)
+
+### 4. order_items 테이블
+- id: uuid (PK)
+- order_id: uuid (FK -> orders.id)
+- product_id: uuid (FK -> products.id)
+- quantity: integer (NOT NULL, > 0, 기본값: 1)
+- unit_price: numeric (NOT NULL, >= 0)
+- unit_sale_price: numeric (NULL 가능)
+- product_name: text (NULL 가능)
+- product_image_url: text (NULL 가능)
+- line_subtotal: numeric (NOT NULL, >= 0, 기본값: 0)
+
+### 5. payments 테이블
+- id: uuid (PK)
+- order_id: uuid (FK -> orders.id)
+- user_id: uuid (FK -> users.id)
+- provider: text (NOT NULL, 기본값: 'mock')
+- method: text (NOT NULL, 기본값: 'card')
+- amount: numeric (NOT NULL, >= 0)
+- currency: text (NOT NULL, 기본값: 'USD')
+- status: text (NOT NULL, 'pending' | 'succeeded' | 'failed' | 'cancelled', 기본값: 'pending')
+- transaction_id: text (NULL 가능)
+- payment_key: text (NULL 가능)
+- raw_payload: jsonb (NULL 가능)
+- created_at: timestamp with time zone (기본값: now())
+- approved_at: timestamp with time zone (NULL 가능)
+
+### 6. reviews 테이블
+- id: uuid (PK)
+- user_id: uuid (FK -> users.id)
+- product_id: uuid (FK -> products.id)
+- rating: integer (NOT NULL, 1 <= rating <= 5)
+- content: text (NULL 가능)
+- created_at: timestamp with time zone (기본값: now())
+
+### 7. cart_items 테이블
+- id: uuid (PK)
+- user_id: uuid (FK -> users.id, 나중에 auth.users.id로 변경 예정)
+- product_id: uuid (FK -> products.id)
+- quantity: integer (NOT NULL, > 0, 기본값: 1)
+- created_at: timestamp with time zone (기본값: now())
+- updated_at: timestamp with time zone (기본값: now())
+
+### 8. like_items 테이블
+- id: uuid (PK)
+- user_id: uuid (FK -> users.id)
+- product_id: uuid (FK -> products.id)
+- created_at: timestamp with time zone (기본값: now())
+- UNIQUE 제약: (user_id, product_id) - 한 사용자가 같은 상품을 중복 찜할 수 없음
+
+### 9. mcp_settings 테이블
+- id: uuid (PK)
+- slack_enabled: boolean (NOT NULL, 기본값: false)
+- notion_enabled: boolean (NOT NULL, 기본값: false)
+- notion_url: text (NULL 가능)
+- notion_report_per_payment: boolean (NOT NULL, 기본값: false)
+- notion_report_monthly_manual: boolean (기본값: false)
+- notion_report_monthly_auto: boolean (기본값: false)
+- created_at: timestamp with time zone (기본값: now())
+- updated_at: timestamp with time zone (기본값: now())
+
+## 추가 요구사항
+1. user_role enum 타입 생성
+2. 모든 외래 키에 ON DELETE CASCADE 또는 적절한 동작 설정
+3. 인덱스는 필요시 추가 (성능 최적화)
+4. 주석으로 각 테이블과 컬럼의 용도 설명
+
+출력 형식: SQL 마이그레이션 파일 형식 (supabase/migrations/0001_init_schema.sql)
