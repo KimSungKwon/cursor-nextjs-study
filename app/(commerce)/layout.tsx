@@ -1,3 +1,4 @@
+import { LayoutFooter } from "@/components/commerce/layout/LayoutFooter";
 import { LayoutHeader } from "@/components/commerce/layout/LayoutHeader";
 
 const CommerceLayout = ({
@@ -9,6 +10,7 @@ const CommerceLayout = ({
     <div className="flex min-h-screen flex-col bg-[var(--commerce-background-default)]">
       <LayoutHeader />
       <main className="flex flex-1 flex-col">{children}</main>
+      <LayoutFooter />
     </div>
   );
 };

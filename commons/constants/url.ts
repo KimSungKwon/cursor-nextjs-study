@@ -33,6 +33,9 @@ export const COMMERCE_URLS = {
   PRODUCT_DETAIL: (productId: string) => `/products/${productId}`,
   CART: "/cart",
   CONTACT: "/contact",
+  ABOUT: "/about",
+  PRIVACY: "/privacy",
+  TERMS: "/terms",
 } as const;
 
 /** 관리자 전용 */
