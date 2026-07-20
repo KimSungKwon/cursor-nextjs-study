@@ -2,18 +2,35 @@
 
 import { useRouter } from "next/navigation";
 import { COMMERCE_URLS } from "@/commons/constants/url";
+import { useInfiniteScroll } from "@/commons/hooks/useInfiniteScroll";
 import { useCartStore } from "@/commons/store/cart-store";
 import { HomeHeroSection } from "@/components/commerce/home/HomeHeroSection";
 import { ProductGrid } from "@/components/commerce/ProductGrid/ProductGrid";
-import { useProductsQuery } from "@/features/products/api/useProductsQuery";
-
-const PRODUCT_LIMIT = 12;
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { useInfiniteProducts } from "@/features/products/api/useInfiniteProducts";
 
 const CommerceHomePage = () => {
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
-  const { data: products = [], isLoading, isError, error } = useProductsQuery({
-    limit: PRODUCT_LIMIT,
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteProducts();
+
+  const products = data?.pages.flatMap((page) => page.items) ?? [];
+
+  const loadMoreRef = useInfiniteScroll({
+    onLoadMore: () => {
+      if (hasNextPage && !isFetchingNextPage) {
+        void fetchNextPage();
+      }
+    },
+    enabled: hasNextPage === true && isFetchingNextPage === false,
   });
 
   const handleAddToCart = (productId: string) => {
@@ -60,14 +77,24 @@ const CommerceHomePage = () => {
               : "상품 목록을 불러오지 못했습니다."}
           </p>
         ) : (
-          <ProductGrid
-            products={products}
-            columns={4}
-            isLoading={isLoading}
-            onAddToCart={handleAddToCart}
-            onProductClick={handleProductClick}
-            style={{ columnGap: 24, rowGap: 48 }}
-          />
+          <>
+            <ProductGrid
+              products={products}
+              columns={4}
+              isLoading={isLoading}
+              onAddToCart={handleAddToCart}
+              onProductClick={handleProductClick}
+              style={{ columnGap: 24, rowGap: 48 }}
+            />
+
+            {hasNextPage ? (
+              <div ref={loadMoreRef} className="h-8" aria-hidden />
+            ) : null}
+
+            {isFetchingNextPage ? (
+              <LoadingSpinner className="mt-8" />
+            ) : null}
+          </>
         )}
       </section>
 
