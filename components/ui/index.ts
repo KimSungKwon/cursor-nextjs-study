@@ -18,6 +18,11 @@ export {
 } from "./IconButton";
 export { Input, type InputProps, type InputVariant } from "./Input";
 export {
+  LoadingSpinner,
+  type LoadingSpinnerProps,
+  type LoadingSpinnerSize,
+} from "./LoadingSpinner";
+export {
   Pagination,
   type PaginationProps,
   type PaginationVariant,
