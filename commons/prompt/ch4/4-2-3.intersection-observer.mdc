@@ -1,3 +1,36 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+app/(commerce)/page.tsx 파일을 수정해줘.
+
+요구사항:
+1. useProductsQuery 대신 useInfiniteProducts 사용 (적용 완료)
+2. data.pages를 flatMap하여 모든 페이지의 데이터를 평탄화
+3. useInfiniteScroll 훅을 사용하여 무한 스크롤 구현
+4. 하단에 sentinel 요소 추가 (ref={loadMoreRef})
+5. isFetchingNextPage일 때 하단에 로딩 UI 표시
+
+변경 사항:
+- 기존: const { data: products } = useProductsQuery();
+- 변경: const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteProducts();
+- const products = data?.pages.flatMap(page => page.items) ?? [];
+
+- useInfiniteScroll 훅 사용:
+  const loadMoreRef = useInfiniteScroll({
+    onLoadMore: () => {
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    enabled: hasNextPage === true && isFetchingNextPage === false,
+  });
+
+- 하단에 sentinel 요소 추가:
+  {hasNextPage && <div ref={loadMoreRef} className="h-8" />}
+
+- 추가 페이지 로딩 UI:
+  {isFetchingNextPage && <LoadingSpinner className="mt-8" />}
+
+만들 파일:
+- features/products/api/useInfiniteProducts.ts
+- commons/hooks/useInfiniteScroll.ts"

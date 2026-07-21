@@ -1,0 +1,30 @@
+---
+alwaysApply: false
+---
+features/products/api/useInfiniteProducts.ts 파일을 생성해줘.
+
+요구사항:
+1. useInfiniteQuery를 사용하여 무한 스크롤 구현
+2. Supabase products 테이블에서 페이지네이션된 데이터 조회
+3. PAGE_SIZE = 12으로 설정
+4. range() 메서드를 사용하여 offset 기반 페이지네이션 구현
+
+구현 내용:
+1. useInfiniteQuery import
+2. PAGE_SIZE 상수 정의 (12)
+3. queryFn 구현:
+   - pageParam을 받아서 offset 계산 (pageParam * PAGE_SIZE)
+   - Supabase 쿼리: .from("products").select("*").range(offset, offset + PAGE_SIZE - 1)
+   - status가 "hidden"이 아닌 상품만 조회 (.neq("status", "hidden"))
+   - 최신순 정렬 (.order("created_at", { ascending: false }))
+   - Supabase row를 Product 타입으로 매핑
+4. getNextPageParam 구현:
+   - lastPage의 items 길이가 PAGE_SIZE보다 적으면 undefined 반환
+   - 그렇지 않으면 allPages.length 반환
+5. initialPageParam: 0
+6. 반환 타입: useInfiniteQuery의 표준 반환값
+7. hasNextPage가 true이면, 다음 페이지를 fetching 할 수 있는 더보기 버튼을 제공
+
+참고할 파일:
+- features/products/api/useProductsQuery.ts (Supabase 쿼리 참고)
+- components/commerce/types.ts (Product 타입 참고)

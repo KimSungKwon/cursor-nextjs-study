@@ -1,3 +1,32 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+"components/ui/LoadingSpinner.tsx 또는 LoadingDots.tsx 파일을 생성해줘.
+
+요구사항:
+1. 추가 페이지 로딩 중임을 표시하는 컴포넌트
+2. 두 가지 옵션:
+   - LoadingSpinner: 회전하는 스피너
+   - LoadingDots: 점 세 개 애니메이션 (더 부드러운 느낌)
+
+LoadingSpinner 요구사항:
+- Tailwind CSS의 animate-spin 사용
+- border를 사용하여 스피너 구현
+- size prop (sm, md, lg) 지원
+- 접근성: role="status", aria-label, aria-live="polite"
+
+LoadingDots 요구사항:
+- 점 세 개를 가로로 배치
+- 각 점에 animationDelay를 다르게 적용하여 순차적으로 애니메이션
+- Tailwind CSS의 animate-pulse 사용
+- 접근성: role="status", aria-label, aria-live="polite"
+
+스타일링:
+- 디자인 토큰 활용 (--commerce-primary-main, --commerce-border-default)
+- 중앙 정렬 (flex justify-center items-center)
+- 상하 여백 (py-8)
+
+사용 예시:
+{isFetchingNextPage && <LoadingSpinner className="mt-8" />}
+또는
+{isFetchingNextPage && <LoadingDots className="mt-8" />}"
