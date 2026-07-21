@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, type HTMLAttributes } from "react";
 import { ACCOUNT_URLS, COMMERCE_URLS } from "@/commons/constants/url";
 import { useCartStore } from "@/commons/store/cart-store";
 import { cn } from "@/commons/utils/cn";
 import { IconButton } from "@/components/ui/IconButton";
+import { useSearchStore } from "@/features/search/store/searchStore";
 
 export interface LayoutHeaderProps extends HTMLAttributes<HTMLElement> {
   logoText?: string;
@@ -84,8 +84,12 @@ export const LayoutHeader = ({
   className,
   ...props
 }: LayoutHeaderProps) => {
-  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const {
+    isOpen: isSearchOpen,
+    open: openSearch,
+    clear: clearSearch,
+  } = useSearchStore();
   const storeCartCount = useCartStore((state) => state.totalQuantity);
   const resolvedCartCount = cartCount ?? storeCartCount;
   const badgeLabel =
@@ -96,7 +100,11 @@ export const LayoutHeader = ({
       onSearchClick();
       return;
     }
-    router.push(COMMERCE_URLS.SHOP);
+    if (isSearchOpen) {
+      clearSearch();
+    } else {
+      openSearch();
+    }
   };
 
   return (
@@ -122,9 +130,17 @@ export const LayoutHeader = ({
 
         <div className="flex items-center gap-2 sm:gap-4">
           <IconButton
-            aria-label="검색"
+            aria-label={isSearchOpen ? "검색 닫기" : "검색"}
+            aria-pressed={isSearchOpen}
             size="sm"
-            className="hidden text-[var(--commerce-text-secondary)] sm:inline-flex"
+            className={cn(
+              "hidden sm:inline-flex transition-colors",
+              "hover:text-[var(--commerce-text-primary)]",
+              "active:text-[var(--commerce-primary-main)]",
+              isSearchOpen
+                ? "text-[var(--commerce-primary-main)]"
+                : "text-[var(--commerce-text-secondary)]",
+            )}
             onClick={handleSearchClick}
           >
             <SearchIcon />
@@ -178,7 +194,15 @@ export const LayoutHeader = ({
             <li>
               <button
                 type="button"
-                className="flex w-full items-center gap-3 text-left font-[family-name:var(--commerce-font-family-body)] text-base text-[var(--commerce-text-secondary)]"
+                className={cn(
+                  "flex w-full items-center gap-3 text-left font-[family-name:var(--commerce-font-family-body)] text-base transition-colors",
+                  "hover:text-[var(--commerce-text-primary)]",
+                  "active:text-[var(--commerce-primary-main)]",
+                  isSearchOpen
+                    ? "text-[var(--commerce-primary-main)]"
+                    : "text-[var(--commerce-text-secondary)]",
+                )}
+                aria-pressed={isSearchOpen}
                 onClick={() => {
                   setMenuOpen(false);
                   handleSearchClick();
