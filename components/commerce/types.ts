@@ -28,8 +28,8 @@ export interface ShippingOption {
 }
 
 export function formatCommercePrice(value: number): string {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("ko-KR", {
     style: "currency",
-    currency: "USD",
+    currency: "KRW",
   }).format(value);
 }
