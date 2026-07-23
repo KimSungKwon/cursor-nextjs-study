@@ -1,4 +1,5 @@
 import { cn } from "@/commons/utils/cn";
+import { AddToCartSection } from "@/components/commerce/product/AddToCartSection";
 import { ProductInfoSection } from "@/components/commerce/product/ProductInfoSection";
 import {
   toProductDetail,
@@ -11,7 +12,7 @@ export interface ProductDetailProps {
 }
 
 /**
- * 상품 상세: 이미지 + 상품 정보 섹션
+ * 상품 상세: 이미지 + 상품 정보 + 장바구니 추가
  */
 export const ProductDetail = ({ product, className }: ProductDetailProps) => {
   const detail = toProductDetail(product);
@@ -41,7 +42,13 @@ export const ProductDetail = ({ product, className }: ProductDetailProps) => {
         )}
       </div>
 
-      <ProductInfoSection product={detail} />
+      <div className="flex flex-col gap-6">
+        <ProductInfoSection product={detail} />
+        <AddToCartSection
+          product={detail}
+          initialIsLiked={product.isLiked}
+        />
+      </div>
     </article>
   );
 };
