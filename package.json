@@ -10,6 +10,7 @@
     "db:run-migration": "tsx scripts/run-migration.ts",
     "db:run-rls": "tsx scripts/run-rls.ts",
     "db:seed-products": "tsx scripts/seed-products.ts",
+    "db:seed-reviews": "tsx scripts/seed-reviews.ts",
     "storybook": "node scripts/run-storybook.js dev -p 6006",
     "build-storybook": "node scripts/run-storybook.js build",
     "postinstall": "node scripts/patch-next-config-shim.js"
