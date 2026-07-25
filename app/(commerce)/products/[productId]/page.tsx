@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/commerce/ProductDetail/ProductDetail";
 import { getProductById } from "@/features/products/api/useProductDetail";
 import { ProductDetailTabs } from "./_components/ProductDetailTabs";
+import { ProductReviewsSection } from "./_components/ProductReviewsSection";
 
 type ProductDetailPageProps = {
   params: Promise<{ productId: string }>;
@@ -76,18 +77,7 @@ const ProductDetailPage = async ({ params }: ProductDetailPageProps) => {
             {additionalInfo}
           </p>
         }
-        reviewsContent={
-          <p
-            className="text-[var(--commerce-text-tertiary)]"
-            style={{
-              fontFamily: "var(--commerce-body-md-regular-font-family)",
-              fontSize: "var(--commerce-body-md-regular-font-size)",
-              lineHeight: "26px",
-            }}
-          >
-            아직 등록된 리뷰가 없습니다.
-          </p>
-        }
+        reviewsContent={<ProductReviewsSection productId={product.id} />}
       />
     </div>
   );

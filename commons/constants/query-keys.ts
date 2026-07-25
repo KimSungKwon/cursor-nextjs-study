@@ -4,6 +4,8 @@ export const QUERY_KEYS = {
     list: (filters?: { limit?: number; search?: string }) =>
       ["products", "list", filters] as const,
     detail: (productId: string) => ["products", "detail", productId] as const,
+    reviews: (productId: string) =>
+      ["products", "detail", productId, "reviews"] as const,
   },
   orders: {
     all: ["orders"] as const,
