@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/commerce/ProductDetail/ProductDetail";
 import { getProductById } from "@/features/products/api/useProductDetail";
+import { ProductDetailTabs } from "./_components/ProductDetailTabs";
 
 type ProductDetailPageProps = {
   params: Promise<{ productId: string }>;
@@ -55,10 +56,40 @@ const ProductDetailPage = async ({ params }: ProductDetailPageProps) => {
     notFound();
   }
 
+  const additionalInfo =
+    product.additional_info?.trim() || "추가 정보가 없습니다.";
+
   return (
-    <section className="mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-6 lg:px-10 xl:px-40">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-4 py-8 sm:px-6 lg:px-10 xl:px-40">
       <ProductDetail product={product} />
-    </section>
+      <ProductDetailTabs
+        additionalInfoContent={
+          <p
+            className="whitespace-pre-wrap text-[var(--commerce-text-tertiary)]"
+            style={{
+              fontFamily: "var(--commerce-body-md-regular-font-family)",
+              fontSize: "var(--commerce-body-md-regular-font-size)",
+              fontWeight: "var(--commerce-body-md-regular-font-weight)",
+              lineHeight: "26px",
+            }}
+          >
+            {additionalInfo}
+          </p>
+        }
+        reviewsContent={
+          <p
+            className="text-[var(--commerce-text-tertiary)]"
+            style={{
+              fontFamily: "var(--commerce-body-md-regular-font-family)",
+              fontSize: "var(--commerce-body-md-regular-font-size)",
+              lineHeight: "26px",
+            }}
+          >
+            아직 등록된 리뷰가 없습니다.
+          </p>
+        }
+      />
+    </div>
   );
 };
 
