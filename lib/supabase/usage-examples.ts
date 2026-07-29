@@ -6,17 +6,17 @@
 
 // ---------------------------------------------------------------------------
 // 1) 클라이언트 컴포넌트에서 데이터 가져오기
-//    getSupabaseBrowserClient() → from("products").select("*")
+//    createClient() from @/lib/supabase/browser
 // ---------------------------------------------------------------------------
 //
 // "use client";
 //
 // import { useEffect } from "react";
-// import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+// import { createClient } from "@/lib/supabase/browser";
 //
 // export function ProductList() {
 //   useEffect(() => {
-//     const supabase = getSupabaseBrowserClient();
+//     const supabase = createClient();
 //
 //     supabase
 //       .from("products")
@@ -32,19 +32,19 @@
 
 // ---------------------------------------------------------------------------
 // 2) 서버 액션에서 데이터 생성
-//    createClient() → from("orders").insert(...)
+//    createClient() from @/lib/supabase/server
 // ---------------------------------------------------------------------------
 //
 // "use server";
 //
-// import { createClient as getSupabaseServerClient } from "@/lib/supabase/server";
+// import { createClient } from "@/lib/supabase/server";
 //
 // export async function createOrder(input: {
 //   userId: string;
 //   productId: string;
 //   quantity: number;
 // }) {
-//   const supabase = await getSupabaseServerClient();
+//   const supabase = await createClient();
 //
 //   const { data, error } = await supabase
 //     .from("orders")

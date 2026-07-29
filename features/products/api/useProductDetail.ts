@@ -4,7 +4,7 @@ import type {
   ProductStatus,
 } from "@/commons/types/product";
 import type { Product } from "@/components/commerce/types";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 export type { ProductStatus };
 
@@ -93,7 +93,7 @@ export function toProductDetail(product: ProductDetailData): ProductDetail {
 export async function getProductById(
   productId: string,
 ): Promise<ProductDetailData | null> {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("products")
