@@ -17,6 +17,7 @@ export {
   type IconButtonVariant,
 } from "./IconButton";
 export { Input, type InputProps, type InputVariant } from "./Input";
+export { Checkbox, type CheckboxProps } from "./Checkbox";
 export {
   LoadingSpinner,
   type LoadingSpinnerProps,

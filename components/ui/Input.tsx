@@ -92,7 +92,6 @@ export const Input = ({
           <span
             className="shrink-0"
             style={{ color: commerceColors.text.tertiary }}
-            aria-hidden
           >
             {rightIcon}
           </span>
