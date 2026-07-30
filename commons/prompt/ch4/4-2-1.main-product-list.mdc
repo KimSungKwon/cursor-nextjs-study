@@ -1,3 +1,34 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+4-2-1.main-layout.mdc 홈 화면 디자인 분석 결과를 참고해서 작업해줘
+
+"components/commerce/home/HomePage.tsx 파일을 생성해줘.
+
+요구사항:
+1. 상품 그리드 레이아웃 (CSS Grid 사용)
+2. 반응형 그리드 (모바일 2열, 태블릿 3열, 데스크톱 4열)
+3. 실제 상품 데이터 사용 (supabase에서 12개 데이터 가져오기)
+4. ProductCard 컴포넌트 재사용
+
+데이터 구조:
+```typescript
+const products = [
+  {
+    id: "1",
+    name: "Product Name",
+    price: 29900,
+    imageUrl: "https://images.unsplash.com/photo-...",
+    // ... 기타 필드
+  },
+  // ... 더 많은 상품
+];
+```
+
+스타일링:
+- Tailwind CSS 사용
+- 디자인 토큰 활용 (--commerce-*)
+- 그리드 간격: gap-4 md:gap-6
+
+참고할 Figma 디자인:
+- Figma 링크의 Product List 섹션

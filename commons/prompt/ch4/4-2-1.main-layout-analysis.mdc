@@ -1,3 +1,19 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+TalkToFigma로 Homepage 01(Figma node-id=3:677) UI를 분석하고 결과를 문서로 정리해줘.
+
+## 목표
+- 커머스 홈 `app/(commerce)/page.tsx` 레이아웃 골격 파악
+- Header / Main(상품·Values·Banner) / Footer 구조와 토큰 매핑
+
+## 결과 저장
+- `commons/prompt/ch4/4-2-1.main-layout-analysis-result.mdc`
+- alwaysApply: false
+
+## 포함 내용
+1. 섹션 순서·node-id·크기
+2. 상품 그리드(열/갭/카드 크기)
+3. Header / Footer / Banner / Values 스펙
+4. commerce 디자인 토큰 매핑
+5. 구현 우선순위

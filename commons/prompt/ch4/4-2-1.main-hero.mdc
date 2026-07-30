@@ -1,3 +1,21 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+4-2-1.main-layout.mdc 홈 화면 디자인 분석 결과를 참고해서 작업해줘
+
+components/commerce/home/HomeHeroSection.tsx 파일을 생성해줘.
+
+요구사항:
+1. 히어로 이미지/배경
+2. 메인 타이틀
+3. 서브 타이틀
+4. CTA 버튼 (Call to Action)
+5. 반응형 디자인
+
+스타일링:
+- Tailwind CSS 사용
+- 디자인 토큰 활용 (--commerce-*)
+- 그라데이션 배경 또는 이미지 배경
+
+참고할 Figma 디자인:
+- Figma 링크의 Hero/Banner 섹션
