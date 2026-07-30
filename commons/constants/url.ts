@@ -2,6 +2,13 @@
 
 export type RouteAccess = "public" | "member" | "admin";
 
+/** proxy 접근 제어 정책 */
+export type AccessPolicy =
+  | "public"
+  | "guest-only"
+  | "member-only"
+  | "super-admin-only";
+
 export interface RouteConfig {
   path: string;
   access: RouteAccess;
@@ -96,4 +103,46 @@ export function getRouteConfig(pathname: string): RouteConfig | undefined {
   if (parentAccess) return { path: pathname, access: parentAccess, dynamic: true };
 
   return undefined;
+}
+
+/** 로그인/회원가입 등 비로그인 전용 경로 */
+export function isGuestOnlyRoute(pathname: string): boolean {
+  return pathname === AUTH_URLS.LOGIN || pathname === AUTH_URLS.SIGNUP;
+}
+
+/** 관리자 영역 경로 */
+export function isAdminRoute(pathname: string): boolean {
+  return (
+    pathname === ADMIN_URLS.DASHBOARD ||
+    pathname.startsWith(`${ADMIN_URLS.DASHBOARD}/`)
+  );
+}
+
+/**
+ * pathname → proxy 접근 정책
+ * 인증 페이지는 guest-only, 그 외는 RouteAccess를 AccessPolicy로 매핑한다.
+ */
+export function getAccessPolicy(pathname: string): AccessPolicy {
+  if (isGuestOnlyRoute(pathname)) {
+    return "guest-only";
+  }
+
+  if (isAdminRoute(pathname)) {
+    return "super-admin-only";
+  }
+
+  const config = getRouteConfig(pathname);
+  if (!config) {
+    return "public";
+  }
+
+  switch (config.access) {
+    case "member":
+      return "member-only";
+    case "admin":
+      return "super-admin-only";
+    case "public":
+    default:
+      return "public";
+  }
 }
