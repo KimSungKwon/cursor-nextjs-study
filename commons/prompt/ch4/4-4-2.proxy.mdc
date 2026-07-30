@@ -1,3 +1,35 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+proxy.ts 파일을 생성해줘.
+
+요구사항:
+1. Next.js Proxy 기본 구조:
+   - export async function proxy(req: NextRequest)
+   - NextResponse.next() 기본 응답
+   - pathname 추출
+
+2. 정적/예외 경로 early return:
+   - /_next, /images, /icons, /favicon.ico 등
+
+3. Supabase 클라이언트 생성:
+   - createServerClient 사용
+   - Cookie 기반 세션 관리
+   - req.cookies와 res.cookies 설정
+
+4. 사용자 인증 확인:
+   - supabaseClient.auth.getUser() 호출
+   - user 존재 여부 확인
+
+5. 접근 정책별 처리:
+   - guest-only: 로그인 상태면 홈으로 리다이렉트
+   - member-only: 미로그인 상태면 로그인 페이지로 리다이렉트
+   - super-admin-only: role이 admin이 아니면 홈으로 리다이렉트
+
+6. matcher 설정:
+   - API routes, static files 제외
+
+참고할 파일:
+- commons/constants/url.ts (AccessPolicy, getAccessPolicy, isAdminRoute 등)
+- lib/supabase/server.ts (서버 클라이언트 생성 방법)
+- types/supabase.ts (Database 타입)

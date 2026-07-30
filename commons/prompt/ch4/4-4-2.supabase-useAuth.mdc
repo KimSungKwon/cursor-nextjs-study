@@ -1,3 +1,27 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+기존 코드에서 useAuth 훅과 useSessionStore를 사용하고 있습니다. 
+이제 Supabase Auth를 연동하려고 합니다.
+
+요구사항:
+1. Supabase Auth의 세션 상태를 useSessionStore와 동기화해야 합니다
+2. 로그인/회원가입 시 Supabase의 user 정보를 zustand store에 저장
+3. 페이지 새로고침 시에도 Supabase 세션이 유지되도록 구현
+4. 로그아웃 시 Supabase와 zustand store 모두 초기화
+
+현재 파일 구조:
+- commons/hooks/useAuth.ts (useAuth 훅)
+- commons/store/session-store.ts (zustand store)
+
+필요한 작업:
+1. Supabase client 생성 파일 (lib/supabase/client.ts)
+2. Supabase Auth 상태를 감지하고 zustand store와 동기화하는 Provider 컴포넌트
+3. 기존 useAuth는 그대로 유지하되, Supabase 세션과 연동되도록 수정
+
+참고:
+- UserSession 타입은 { id, email, displayName, role } 구조입니다
+- Supabase users 테이블에 displayName, role 컬럼이 있다고 가정합니다
+- Next.js App Router를 사용 중입니다
+
+위 요구사항에 맞춰서 전체 코드를 작성해주세요.

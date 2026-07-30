@@ -1,0 +1,28 @@
+---
+alwaysApply: false
+---
+
+lib/supabase/browser.ts 파일을 생성해줘.
+
+요구사항:
+1. @supabase/auth-helpers-nextjs의 createBrowserClient 사용
+2. Cookie 기반 세션 관리 (자동 refresh 포함)
+3. NEXT_PUBLIC_* 환경변수만 사용 (브라우저 안전)
+4. Database 타입 제네릭으로 타입 안전성 보장
+
+참고할 파일:
+- commons/config/env.ts (환경 변수 관리)
+- types/supabase.ts (Database 타입)
+
+구현 예시:
+import { createBrowserClient } from "@supabase/auth-helpers-nextjs";
+import { getPublicEnv } from "@/commons/config/env";
+import type { Database } from "@/types/supabase";
+
+export function createClient() {
+  const { supabase } = getPublicEnv();
+  return createBrowserClient<Database>(
+    supabase.url,
+    supabase.publishableKey
+  );
+}
