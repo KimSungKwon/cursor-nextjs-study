@@ -15,14 +15,17 @@ export interface SessionState {
   user: UserSession | null;
   isAuthenticated: boolean; // user !== null
   isAdmin: boolean; // user?.role === "admin"
+  isLoading: boolean; // 초기 세션 동기화 중
   setUser: (user: UserSession) => void;
   clearUser: () => void;
+  setLoading: (isLoading: boolean) => void;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
   user: null,
   isAuthenticated: false,
   isAdmin: false,
+  isLoading: true,
 
   // 로그인 사용자 설정 + 파생 상태(isAuthenticated/isAdmin) 갱신
   setUser: (user) =>
@@ -30,6 +33,7 @@ export const useSessionStore = create<SessionState>((set) => ({
       user,
       isAuthenticated: true,
       isAdmin: user.role === "admin",
+      isLoading: false,
     }),
 
   // 로그아웃: 세션 및 파생 상태 초기화
@@ -38,5 +42,8 @@ export const useSessionStore = create<SessionState>((set) => ({
       user: null,
       isAuthenticated: false,
       isAdmin: false,
+      isLoading: false,
     }),
+
+  setLoading: (isLoading) => set({ isLoading }),
 }));

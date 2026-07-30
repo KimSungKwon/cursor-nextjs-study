@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, Poppins, Space_Grotesk } from "next/font/google";
+import { AuthProvider } from "@/app/_providers/AuthProvider";
 import { ReactQueryProvider } from "@/app/_providers/ReactQueryProvider";
 import "./globals.css";
 
@@ -47,7 +48,9 @@ const RootLayout = ({
       className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <ReactQueryProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );
