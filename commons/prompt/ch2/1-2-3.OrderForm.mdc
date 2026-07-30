@@ -1,3 +1,30 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+Next.js 16 App Router 기반 프로젝트입니다.
+
+상품 상세 페이지에서 "바로 주문하기" 버튼을 보여주세요.
+상품 상세 페이지에서 "바로 주문하기" 버튼을 누르면 주문 form 모달이 나타나도록 해주세요.
+
+요구사항:
+1. OrderForm 컴포넌트 생성 (components/commerce/order/OrderForm.tsx)
+   - 연락처 정보 입력 필드 (이름, 전화번호, 이메일)
+   - 배송지 정보 입력 필드 (수령인 이름, 전화번호, 주소, 상세 주소 등)
+   - 주문 요약 (상품명, 수량, 단가, 총 금액)
+   - 제출 버튼
+
+2. API Route 생성 (app/api/orders/create/route.ts)
+   - POST 메서드
+   - 입력 데이터 검증
+   - localStorage에 저장할 수 있도록 주문 데이터 반환
+   - 반환한 데이터는 클라이언트측에서 localStorage에 저장
+   - 에러 처리
+
+3. 상품 상세 페이지에 "바로 주문하기" 버튼 추가
+   - AddToCartSection 컴포넌트에 버튼 추가
+   - 클릭 시 OrderForm 모달 표시
+
+참고:
+- 기존 ProductCard.tsx 구조 참고
+- Tailwind CSS 사용
+- TypeScript 사용
