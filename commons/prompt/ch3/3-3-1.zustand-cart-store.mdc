@@ -1,3 +1,43 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+TypeScript로 Zustand를 사용하여 장바구니 전역 상태 관리 스토어를 생성해주세요.
+
+## 요구사항
+
+1. **파일 경로**
+   - `commons/store/cart-store.ts`
+
+2. **패키지**
+   - `zustand` 설치 (persist 미들웨어 포함 — 별도 패키지 아님)
+
+3. **타입 정의**
+   - `ProductStatus`: `"visible" | "hidden" | "sold_out"`
+     (주의: DB 스키마는 `registered`를 쓸 수 있음 — 프롬프트대로 구현 후 불일치 시 보고)
+   - `CartItem`:
+     - `id`: string (products.id)
+     - `name`: string
+     - `price`: number
+     - `quantity`: number
+     - `imageUrl`: string | null
+     - `salePrice`: number | null
+     - `status?`: ProductStatus
+   - `CartProductInput`: `Omit<CartItem, "quantity">`
+   - `CartState`:
+     - `items`, `totalQuantity`, `totalAmount`
+     - `addItem(product, quantity?)`
+     - `updateItemQuantity(productId, quantity)`
+     - `removeItem(productId)`
+     - `clear()`
+
+4. **구현 요구사항**
+   - `addItem`: 동일 id면 수량 증가, 없으면 추가 (기본 quantity = 1)
+   - `updateItemQuantity`: 수량 0 이하면 항목 제거
+   - `totalQuantity` / `totalAmount`: items 기반 자동 계산, **salePrice 우선** 적용
+   - `persist` 미들웨어 + storage key `"commerce_cart_v1"`
+   - `partialize`로 items만 저장, 복원 시 합계 재계산 권장
+
+5. **출력 형식**
+   - TypeScript 타입 안전성 유지
+   - 주석으로 각 함수 역할 설명
+   - 간단하고 명확한 구조
