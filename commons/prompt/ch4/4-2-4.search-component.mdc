@@ -1,3 +1,72 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+
+features/search/components/SearchOverlay.tsx 파일을 생성해줘.
+
+요구사항:
+1. 오버레이 레이아웃:
+   - fixed 포지셔닝 (top: 헤더 높이, left: 0, right: 0, bottom: 0)
+   - z-index: 100 (헤더보다 위)
+   - 배경색: var(--commerce-background-default)
+
+2. 슬라이드 애니메이션:
+   - isOpen이 true일 때: 위에서 아래로 슬라이드 (translate-y-0)
+   - isOpen이 false일 때: 아래로 숨김 (-translate-y-4)
+   - opacity 애니메이션 (0 → 1)
+   - transition-all duration-200 ease-out
+
+3. 상단 바:
+   - 왼쪽: "Search" 타이틀
+   - 가운데: 검색 입력 필드 (검색 아이콘 포함)
+   - 오른쪽: 닫기 버튼 (X 아이콘)
+
+4. 검색 입력 필드:
+   - 검색 아이콘 (왼쪽)
+   - placeholder: "Search products..."
+   - value: keyword (searchStore에서 가져오기)
+   - onChange: setKeyword 호출
+   - ESC 키로 닫기
+
+5. 검색 결과 영역:
+   - 검색어가 있을 때: useProductSearch 결과 표시
+   - 검색어가 없을 때: useInfiniteProducts로 모든 상품 표시
+   - ProductGrid 컴포넌트 사용
+   - 로딩 스켈레톤 표시
+
+6. 접근성:
+   - ESC 키로 닫기
+   - 배경 클릭 시 닫기
+   - aria-label 추가
+
+참고할 파일:
+- features/search/store/searchStore.ts
+- features/search/api/useProductSearch.ts
+- components/commerce/ProductGrid/ProductGrid.tsx
+
+---
+
+Figma 디자인을 참고하여 SearchOverlay 컴포넌트를 구현해줘.
+
+Figma 링크:
+https://www.figma.com/design/PrPYG8hrEWB6IMFit7gol5/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=267-1990&t=qXhg894P8LDRq8kP-4
+
+요구사항:
+1. Figma MCP를 사용하여 디자인 정보 읽어오기:
+   - TalkToFigma MCP로 해당 노드 ID의 디자인 정보 가져오기
+   - 레이아웃, 색상, 타이포그래피, 간격 등 디자인 토큰 추출
+
+2. 디자인 토큰 반영:
+   - 색상: var(--commerce-*) CSS 변수 사용
+   - 타이포그래피: Figma에서 정의된 폰트 크기, 굵기 사용
+   - 간격: Figma spacing 값 사용 (padding, margin, gap)
+
+3. 레이아웃:
+   - 상단 바 높이: Figma에서 확인한 값
+   - 검색 입력 필드 높이, padding, border-radius: Figma 값
+   - 컨테이너 최대 너비: max-w-[1320px] (기존과 동일)
+
+4. 스타일링:
+   - Tailwind CSS utility class 사용
+   - 디자인 토큰을 CSS 변수로 참조
+   - 반응형 디자인 적용 (모바일/태블릿/데스크톱)

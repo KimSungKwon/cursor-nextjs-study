@@ -1,3 +1,25 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+features/search/api/useProductSearch.ts 파일을 생성해줘.
+
+요구사항:
+1. React Query의 useQuery를 사용하여 상품 검색 구현
+2. 디바운스 적용:
+   - useDebouncedValue 훅 사용 (350ms)
+   - 검색어 입력 시 불필요한 요청 방지
+3. Supabase 쿼리:
+   - products 테이블에서 name, description 컬럼 검색
+   - .or() 메서드로 name 또는 description에 검색어 포함
+   - .ilike()로 대소문자 구분 없이 부분 일치 검색
+   - status가 "hidden"이 아닌 상품만 조회
+   - limit 없이 모든 상품 검색
+4. React Query 옵션:
+   - enabled: debouncedKeyword.length > 0 (검색어가 있을 때만 요청)
+   - queryKey: ["products", "search", debouncedKeyword]
+5. 에러 처리:
+   - 에러 발생 시 throw하여 React Query가 catch하도록
+
+참고할 파일:
+- features/products/api/useProductsQuery.ts (Supabase 쿼리 패턴)
+- components/commerce/types.ts (Product 타입)

@@ -1,0 +1,29 @@
+---
+alwaysApply: false
+---
+components/commerce/layout/LayoutHeader.tsx 파일을 수정해줘.
+
+요구사항:
+1. useSearchStore import:
+   - useSearchStore 훅 import
+   - isOpen, open, clear 함수 가져오기
+
+2. 검색 아이콘 버튼 수정:
+   - onClick 핸들러 추가
+   - isSearchOpen이 true면 clearSearch() 호출 (닫기 + 검색어 초기화)
+   - isSearchOpen이 false면 openSearch() 호출 (열기)
+
+3. 검색 아이콘 스타일:
+   - isSearchOpen일 때 아이콘 색상 변경 (활성화 상태 표시)
+   - hover, active 상태 스타일 추가
+
+변경 사항:
+- 기존: <button><FiSearch /></button>
+- 변경: 
+  const { isOpen: isSearchOpen, open: openSearch, clear: clearSearch } = useSearchStore();
+  <button onClick={() => { isSearchOpen ? clearSearch() : openSearch(); }}>
+    <FiSearch />
+  </button>
+
+참고할 파일:
+- features/search/store/searchStore.ts

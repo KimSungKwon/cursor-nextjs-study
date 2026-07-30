@@ -1,0 +1,23 @@
+---
+alwaysApply: false
+---
+features/search/store/searchStore.ts 파일을 생성해줘.
+
+요구사항:
+1. Zustand를 사용하여 검색 상태를 전역으로 관리
+2. 상태:
+   - isOpen: boolean (검색바 열림/닫힘)
+   - keyword: string (검색어)
+3. 액션:
+   - open(): 검색바 열기 (isOpen = true)
+   - close(): 검색바 닫기 (isOpen = false, keyword는 유지)
+   - setKeyword(value: string): 검색어 설정
+   - clear(): 검색바 닫기 + 검색어 초기화 (isOpen = false, keyword = "")
+
+타입 정의:
+- SearchState 인터페이스로 상태와 액션 타입 정의
+- useSearchStore 훅으로 export
+
+참고:
+- Zustand create 함수 사용
+- 클라이언트 전용이므로 "use client" 선언
