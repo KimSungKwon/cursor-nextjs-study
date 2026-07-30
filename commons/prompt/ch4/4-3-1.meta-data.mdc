@@ -1,3 +1,37 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+app/(commerce)/products/[productId]/page.tsx 파일에 generateMetadata 함수를 추가해줘.
+
+요구사항:
+1. generateMetadata 함수 생성:
+   - params에서 productId 추출
+   - getProductById로 상품 데이터 조회
+   - 상품이 없으면 기본 메타데이터 반환
+
+2. 메타데이터 구성:
+   - title: "{상품명} - Cursor Commerce"
+   - description: 상품 설명 또는 기본 설명
+   - keywords: [상품명, "상품", "커머스"]
+   - openGraph:
+     - title: 상품명
+     - description: 상품 설명
+     - images: [{ url: 상품 이미지, width: 1200, height: 630, alt: 상품명 }]
+     - type: "website"
+   - twitter:
+     - card: "summary_large_image"
+     - title: 상품명
+     - description: 상품 설명
+     - images: [상품 이미지]
+
+3. 타입:
+   - import type { Metadata } from "next"
+   - 반환 타입: Promise<Metadata>
+
+4. 에러 처리:
+   - 상품이 없으면 기본 메타데이터 반환
+   - 이미지가 없으면 빈 문자열 또는 기본 이미지 사용
+
+참고할 파일:
+- lib/supabase/server.ts (getProductById 함수)
+- components/commerce/types.ts (Product 타입)

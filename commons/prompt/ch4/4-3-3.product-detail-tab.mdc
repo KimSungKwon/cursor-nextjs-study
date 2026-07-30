@@ -1,3 +1,27 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+app/(commerce)/products/[productId]/_components/ProductDetailTabs.tsx 파일을 생성해줘.
+
+요구사항:
+1. 컴포넌트 구조:
+   - Client Component ("use client")
+   - Props: defaultTab?: "additional-info" | "reviews", additionalInfoContent, reviewsContent
+   - useState로 activeTab 상태 관리
+
+2. Figma 디자인 기준 구현:
+   - 탭 헤더: flex 레이아웃, border-bottom 구분선
+   - 활성 탭: text-[var(--commerce-text-primary)], border-b-2
+   - 비활성 탭: text-[var(--commerce-text-tertiary)]
+   - 탭 콘텐츠: activeTab에 따라 조건부 렌더링
+
+3. 탭 전환:
+   - 버튼 클릭 시 setActiveTab으로 상태 변경
+   - transition-colors로 부드러운 전환 효과
+
+4. 접근성:
+   - button 태그 사용
+   - aria-selected 속성 추가 (선택사항)
+
+참고할 파일:
+- Figma: https://www.figma.com/design/PrPYG8hrEWB6IMFit7gol5/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=37-1912&t=qXhg894P8LDRq8kP-4

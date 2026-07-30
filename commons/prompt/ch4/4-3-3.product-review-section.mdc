@@ -1,3 +1,33 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+app/(commerce)/products/[productId]/_components/ProductReviewsSection.tsx 파일을 생성해줘.
+
+요구사항:
+1. 컴포넌트 구조:
+   - Client Component ("use client")
+   - Props: productId, currentUserId?, isSuperAdmin?
+   - useAuth 훅으로 로그인 상태 확인
+
+2. Figma 디자인 기준 구현:
+   - AI Review 박스: 회색 배경 카드, AI 아이콘 + "AI Review" 제목 + 요약 내용
+   - Customer Reviews 헤더: "Customer Reviews" 제목 + 별점 + 리뷰 수
+   - 리뷰 작성 폼: 로그인 상태에 따라 ReviewForm 또는 로그인 유도 메시지
+   - 리뷰 리스트: Review Card를 활용한 ReviewList 컴포넌트 생성
+
+3. 컴포넌트 구성:
+   - ReviewSummaryDisplay: AI 요약 표시 (mock 데이터)
+   - CustomerReviewsHeader: 별점 + 리뷰 수 표시
+   - ReviewForm: 리뷰 작성 폼 (로그인 상태)
+   - ReviewList: 리뷰 리스트 + Load More
+
+4. 조건부 렌더링:
+   - 로그인 상태: ReviewForm 표시
+   - 비로그인 상태: 로그인 유도 메시지 + 로그인 버튼
+
+참고/생성할 파일:
+- components/commerce/ReviewForm.tsx (리뷰 작성 폼)
+- app/(commerce)/products/[productId]/_components/ReviewList.tsx (리뷰 리스트)
+- app/(commerce)/products/[productId]/_components/CustomerReviewsHeader.tsx (헤더)
+- commons/hooks/useAuth.ts (인증 훅)
+- Figma: https://www.figma.com/design/PrPYG8hrEWB6IMFit7gol5/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=37-1912&t=qXhg894P8LDRq8kP-4

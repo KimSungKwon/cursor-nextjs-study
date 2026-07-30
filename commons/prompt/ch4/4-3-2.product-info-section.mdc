@@ -1,3 +1,32 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+components/commerce/product/ProductInfoSection.tsx 파일을 생성해줘.
+
+요구사항:
+1. 컴포넌트 구조:
+   - Client Component ("use client")
+   - Props: product: ProductDetail
+   - useProductRating 훅으로 별점/리뷰 수 조회
+
+2. Figma 디자인 기준 구현:
+   - 별점 + 리뷰 수: RatingStars 컴포넌트 + "{reviewCount} Reviews" 텍스트
+   - 상품명: h1, Poppins Medium 40px, letter-spacing -0.4px, line-height 44px
+   - 설명: p 태그, Inter Regular 16px, line-height 26px, color var(--commerce-text-tertiary)
+   - 가격: salePrice 있으면 할인가(28px) + 원가(20px, line-through), 없으면 가격만(28px)
+   - Measurements: 라벨(Inter Semi Bold 14px) + 값(Inter Regular 14px)
+   - Category: border-top 구분선, "CATEGORY" 라벨(12px) + 카테고리 목록(12px, 쉼표 구분)
+
+3. 디자인 토큰 활용:
+   - 색상: var(--commerce-text-primary), var(--commerce-text-tertiary)
+   - 간격: gap-[24px] (섹션 간), gap-[8px] (요소 간)
+
+4. 데이터 처리:
+   - useProductRating 훅으로 rating, reviewCount 조회
+   - 리뷰가 없으면 별점 0, 리뷰 수 표시 안 함
+   - measurements, categories는 product에서 가져오되, 없으면 기본값 사용
+
+참고할 파일:
+- components/commerce/RatingStars/RatingStars.tsx (별점 컴포넌트)
+- commons/types/product.ts (ProductDetail 타입)
+- Figma: https://www.figma.com/design/PrPYG8hrEWB6IMFit7gol5/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=37-1912&t=qXhg894P8LDRq8kP-4

@@ -1,3 +1,37 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+components/commerce/product/AddToCartSection.tsx 파일을 생성해줘.
+
+요구사항:
+1. 컴포넌트 구조:
+   - Client Component ("use client")
+   - Props: product: ProductDetail, initialIsLiked?: boolean
+   - useState로 quantity, isWishlisted 상태 관리
+   - useCartStore로 장바구니 상태 관리
+
+2. Figma 디자인 기준 구현:
+   - QuantitySelector: 127x52px, rounded 8px, 배경 #f5f5f5
+   - Wishlist 버튼: 357x52px, border, 하트 아이콘 + "Wishlist" 텍스트
+   - Add to Cart 버튼: 508x52px, 검은 배경 (#141718), 흰 텍스트, rounded 8px
+
+3. 기능 구현:
+   - QuantitySelector: quantity 상태와 연결, min=1
+   - Wishlist 버튼: toggleLikeItem Server Action 호출, Optimistic UI 업데이트
+   - Add to Cart 버튼: useCartStore.addItem 호출, toast 알림
+
+4. 상태 관리:
+   - quantity: useState(1)
+   - isWishlisted: useState(initialIsLiked), useEffect로 동기화
+   - isPending: 위시리스트 처리 중 상태
+
+5. 에러 처리:
+   - AuthRequiredError 발생 시 로그인 페이지로 리다이렉트
+   - 장바구니 추가 실패 시 toast.error 표시
+
+참고할 파일:
+- components/commerce/QuantitySelector/QuantitySelector.tsx (수량 선택기)
+- commons/store/cart-store.ts (장바구니 스토어)
+- app/(commerce)/likes/actions.ts (toggleLikeItem Server Action)
+- components/ui/button.tsx (Button 컴포넌트)
+- Figma: https://www.figma.com/design/D4FSoaSMyEH857s3Hqverw/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF?node-id=37-1912"

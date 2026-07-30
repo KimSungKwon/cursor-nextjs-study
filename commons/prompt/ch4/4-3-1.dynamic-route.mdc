@@ -1,3 +1,38 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+
+app/(commerce)/products/[productId]/page.tsx 파일을 생성해줘.
+
+요구사항:
+1. Dynamic Route 설정:
+   - 폴더 구조: app/(commerce)/products/[productId]/page.tsx
+   - params에서 productId 추출
+   - 타입: params: { productId: string }
+
+2. 상품 데이터 조회:
+   - getProductById(productId) 함수로 상품 데이터 가져오기
+   - Supabase products 테이블에서 조회
+   - 에러 처리: 상품이 없으면 404 페이지로 리다이렉트
+
+3. 페이지 컴포넌트:
+   - Server Component로 구현
+   - 상품 데이터를 props로 받아서 렌더링
+   - ProductDetail 컴포넌트에 상품 데이터 전달
+
+4. 기본 구조:
+   export default async function ProductDetailPage({
+     params,
+   }: {
+     params: { productId: string };
+   }) {
+     const product = await getProductById(params.productId);
+     if (!product) {
+       notFound();
+     }
+     return <ProductDetail product={product} />;
+   }
+
+참고할 파일:
+- features/products/api/useProductDetail.ts (데이터 조회 로직)
+- components/commerce/ProductDetail/ProductDetail.tsx (상세 컴포넌트)
