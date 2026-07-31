@@ -1,0 +1,29 @@
+---
+alwaysApply: false
+---
+app/(commerce)/account/page.tsx 파일을 수정해줘.
+
+
+요구사항:
+0. 피그마 링크 step-by-step으로 분석해줘
+- https://www.figma.com/design/wi8a6by2DxDzvTOBu2yyUE/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=63-3891&t=qK4zWXEE3TMbFBw2-4
+
+1. 서버 컴포넌트에서 프로필 조회:
+   - app/(commerce)/account/page.tsx를 서버 컴포넌트로 작업
+   - createClient()로 서버 클라이언트 생성
+   - supabase.auth.getUser()로 세션 확인
+   - supabase.from("users").select("display_name, email, role").eq("id", user.id).single()로 프로필 조회
+
+2. 프로필 정보 표시:
+   - AccountSidebar 컴포넌트에 displayName, email 전달
+   - AccountDetailsForm 컴포넌트에 initialDisplayName, email 전달
+   - AccountDetailsForm 컴포넌트에서 본인 정보를 수정할 수 있도로 작업 (display_name, password)
+
+3. 에러 처리:
+   - 프로필 조회 실패 시 auth.users의 email 사용
+   - displayName이 없으면 null 처리
+
+참고/생성할 파일:
+- lib/supabase/server.ts (서버 클라이언트)
+- components/account/AccountSidebar/AccountSidebar.tsx (사이드바 컴포넌트)
+- components/account/AccountDetailsForm.tsx (프로필 수정 폼)"

@@ -1,51 +1,74 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { redirect } from "next/navigation";
+import { commerceColors } from "@/commons/constants/color";
+import { commerceTypography } from "@/commons/constants/typography";
 import { AUTH_URLS } from "@/commons/constants/url";
-import { useAuth } from "@/commons/hooks/useAuth";
-import { Button } from "@/components/ui/Button";
+import { AccountDetailsForm } from "@/components/account/AccountDetailsForm";
+import { AccountSidebar } from "@/components/account/AccountSidebar/AccountSidebar";
+import { createClient } from "@/lib/supabase/server";
 
-const AccountPage = () => {
-  const router = useRouter();
-  const { isAuthenticated, isLoading, user, signOut } = useAuth();
-  const [isSigningOut, setIsSigningOut] = useState(false);
+type UsersProfileRow = {
+  display_name: string | null;
+  email: string;
+  role: string;
+};
 
-  const handleSignOut = async () => {
-    setIsSigningOut(true);
-    try {
-      await signOut();
-      router.push(AUTH_URLS.LOGIN);
-      router.refresh();
-    } finally {
-      setIsSigningOut(false);
-    }
-  };
+const AccountPage = async () => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    redirect(AUTH_URLS.LOGIN);
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("users")
+    .select("display_name, email, role")
+    .eq("id", user.id)
+    .single();
+
+  const profileRow = profile as UsersProfileRow | null;
+
+  const email =
+    !profileError && profileRow?.email
+      ? profileRow.email
+      : (user.email ?? "");
+
+  const displayName =
+    !profileError && profileRow
+      ? profileRow.display_name
+      : null;
 
   return (
-    <main className="flex flex-1 flex-col gap-4 p-6">
-      <h1 className="text-2xl font-semibold">마이페이지</h1>
-      <p className="text-zinc-600">계정 페이지 placeholder</p>
+    <div className="mx-auto w-full max-w-[1440px] px-4 pb-16 sm:px-6 lg:px-10 xl:px-40">
+      <header className="flex justify-center py-10 sm:py-14 lg:py-20">
+        <h1
+          className="text-center"
+          style={{
+            fontFamily: commerceTypography.fontFamily.heading,
+            fontSize: "clamp(2rem, 5vw, 54px)",
+            fontWeight: commerceTypography.fontWeight.medium,
+            lineHeight: "110%",
+            letterSpacing: "-1px",
+            color: commerceColors.text.primary,
+          }}
+        >
+          My Account
+        </h1>
+      </header>
 
-      {!isLoading && isAuthenticated ? (
-        <div className="mt-4 flex flex-col items-start gap-3">
-          {user?.email ? (
-            <p className="text-sm text-zinc-500">{user.email}</p>
-          ) : null}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={isSigningOut}
-            onClick={() => {
-              void handleSignOut();
-            }}
-          >
-            {isSigningOut ? "로그아웃 중..." : "로그아웃"}
-          </Button>
+      <div className="flex flex-col gap-10 lg:flex-row lg:gap-16 xl:gap-[72px]">
+        <AccountSidebar displayName={displayName} email={email} />
+        <div className="min-w-0 flex-1 lg:pt-0">
+          <AccountDetailsForm
+            initialDisplayName={displayName}
+            email={email}
+          />
         </div>
-      ) : null}
-    </main>
+      </div>
+    </div>
   );
 };
 
