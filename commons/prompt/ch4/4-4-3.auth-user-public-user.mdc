@@ -1,0 +1,40 @@
+---
+alwaysApply: false
+---
+supabase/migrations/0006_auth_users_profile.sql 파일을 생성해줘.
+
+요구사항:
+0. .cursor/rules/03-migration.mdc 참고해서 마이그레이션
+
+1. user_role enum 생성:
+   - CREATE TYPE user_role AS ENUM ('user', 'admin')
+   - 이미 존재하면 생성하지 않음
+
+2. public.users 테이블 재정의:
+   - id: UUID PRIMARY KEY (auth.users.id와 동일)
+   - email: TEXT UNIQUE NOT NULL
+   - display_name: TEXT
+   - role: user_role NOT NULL DEFAULT 'user'
+   - created_at, updated_at: TIMESTAMPTZ
+
+3. Foreign Key 제약 추가:
+   - ALTER TABLE public.users ADD CONSTRAINT users_auth_fk FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
+
+4. handle_new_auth_user() 함수 생성:
+   - SECURITY DEFINER로 실행
+   - auth.users에 INSERT 시 public.users에 프로필 자동 생성
+   - display_name은 raw_user_meta_data에서 추출, 없으면 이메일 앞부분 사용
+   - ON CONFLICT (id) DO NOTHING으로 중복 방지
+
+5. 트리거 생성:
+   - CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_auth_user()
+
+6. 기존 데이터 마이그레이션:
+   - auth.users에 존재하는 모든 유저에 대해 public.users에 프로필 생성
+   
+7. RLS 정책 적용
+   - users 테이블에  현재 사용자 및 admin는 접근/조회/수정/삭제 할 수 있도록 RLS 정책 추가
+   
+참고할 파일:
+- supabase/migrations/0001_init_schema.sql (기존 users 테이블 구조)
+- supabase/migrations/0002_enable_rls_and_policies.sql (RLS 우회 처리)
