@@ -27,3 +27,8 @@ alwaysApply: true
    - 모든 커밋은 되돌릴 수 있어야 함
    - 커밋 전 변경사항을 명확히 파악
    - 중요한 작업 전 백업 브랜치 생성
+
+5. **commons/prompt 프롬프트 커밋 전 검증 (필수)**
+   - `commons/prompt/` 아래 `.mdc`를 커밋할 때, frontmatter만 있고 **본문이 비어 있으면 커밋하지 말 것**
+   - 빈 본문(예: `alwaysApply` frontmatter만 존재, 파일 크기 매우 작음)을 발견하면 **즉시 커밋하지 말고 사용자에게 확인**
+   - 사용자가 본문 복구·저장·제외를 지시할 때까지 해당 프롬프트 파일은 staging/commit에서 보류
