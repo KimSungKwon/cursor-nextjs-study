@@ -1,0 +1,21 @@
+---
+alwaysApply: false
+---
+찜하기 기능을 구현해줘.
+
+1. 데이터베이스: like_items 테이블 존재 (0001_init_schema.sql 참고)
+
+2. Server Actions (app/(commerce)/likes/actions.ts) 생성:
+   - isProductLiked(productId): Promise<boolean>
+   - addLikeItem(productId): Promise<void>
+   - removeLikeItem(productId): Promise<void>
+   - toggleLikeItem(productId): Promise<{ isLiked: boolean }>
+   - 세션 확인, AuthRequiredError throw, revalidatePath 적용
+
+3. 에러 클래스 (app/(commerce)/likes/errors.ts) 생성:
+   - AuthRequiredError 클래스
+
+4. LikeButton 컴포넌트 생성:
+   - Optimistic UI, toast 알림, 에러 처리
+
+참고: lib/supabase/server.ts, commons/constants/url.ts
