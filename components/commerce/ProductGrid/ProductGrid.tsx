@@ -14,6 +14,7 @@ export interface ProductGridProps extends HTMLAttributes<HTMLElement> {
   isLoading?: boolean;
   emptyMessage?: string;
   onAddToCart?: (productId: string) => void;
+  /** ProductCard 내부 LikeButton이 처리하므로 더 이상 사용되지 않습니다 */
   onToggleWishlist?: (productId: string) => void;
   onProductClick?: (productId: string) => void;
 }
@@ -54,7 +55,7 @@ export const ProductGrid = ({
   isLoading = false,
   emptyMessage = "상품이 없습니다.",
   onAddToCart,
-  onToggleWishlist,
+  onToggleWishlist: _onToggleWishlist,
   onProductClick,
   className,
   style,
@@ -105,7 +106,6 @@ export const ProductGrid = ({
           key={product.id}
           product={product}
           onAddToCart={onAddToCart}
-          onToggleWishlist={onToggleWishlist}
           onClick={onProductClick}
         />
       ))}

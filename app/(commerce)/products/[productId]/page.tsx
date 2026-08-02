@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { isProductLiked } from "@/app/(commerce)/likes/actions";
 import { ProductDetail } from "@/components/commerce/ProductDetail/ProductDetail";
 import { getProductById } from "@/features/products/api/useProductDetail";
 import { ProductDetailTabs } from "./_components/ProductDetailTabs";
@@ -57,12 +58,15 @@ const ProductDetailPage = async ({ params }: ProductDetailPageProps) => {
     notFound();
   }
 
+  const liked = await isProductLiked(product.id);
+  const productWithLike = { ...product, isLiked: liked };
+
   const additionalInfo =
     product.additional_info?.trim() || "추가 정보가 없습니다.";
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-4 py-8 sm:px-6 lg:px-10 xl:px-40">
-      <ProductDetail product={product} />
+      <ProductDetail product={productWithLike} />
       <ProductDetailTabs
         additionalInfoContent={
           <p

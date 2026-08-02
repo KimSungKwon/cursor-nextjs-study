@@ -4,14 +4,14 @@ import type { HTMLAttributes, KeyboardEvent, MouseEvent } from "react";
 import { commerceColors } from "@/commons/constants/color";
 import { commerceTypography } from "@/commons/constants/typography";
 import { cn } from "@/commons/utils/cn";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { IconButton } from "@/components/ui/IconButton";
+import { LikeButton } from "@/components/commerce/LikeButton/LikeButton";
 import { RatingStars } from "@/components/commerce/RatingStars/RatingStars";
 import {
   formatCommercePrice,
   type Product,
 } from "@/components/commerce/types";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 
 export interface ProductCardProps
   extends Omit<HTMLAttributes<HTMLElement>, "onClick"> {
@@ -19,34 +19,16 @@ export interface ProductCardProps
   isNew?: boolean;
   discountPercent?: number;
   onAddToCart?: (productId: string) => void;
-  onToggleWishlist?: (productId: string) => void;
+  showWishlist?: boolean;
   onClick?: (productId: string) => void;
 }
-
-const HeartIcon = ({ filled }: { filled?: boolean }) => {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M12 20.5s-7.5-4.35-9.5-9.2C1.2 7.9 3.1 5 6.2 5c1.8 0 3.3 1 3.9 2.4C10.7 6 12.2 5 14 5c3.1 0 5 2.9 3.7 6.3C19.5 16.15 12 20.5 12 20.5z"
-        fill={filled ? commerceColors.semantic.error : "none"}
-        stroke={
-          filled
-            ? commerceColors.semantic.error
-            : commerceColors.text.secondary
-        }
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-};
 
 export const ProductCard = ({
   product,
   isNew,
   discountPercent,
   onAddToCart,
-  onToggleWishlist,
+  showWishlist = true,
   onClick,
   className,
   style,
@@ -115,22 +97,13 @@ export const ProductCard = ({
           ) : null}
         </div>
 
-        {onToggleWishlist ? (
-          <IconButton
-            variant="circle"
-            size="md"
-            aria-label={
-              product.isLiked ? "위시리스트에서 제거" : "위시리스트에 추가"
-            }
-            aria-pressed={product.isLiked}
+        {showWishlist ? (
+          <LikeButton
+            productId={product.id}
+            initialIsLiked={product.isLiked}
+            variant="icon"
             className="absolute right-4 top-4"
-            onClick={(event) => {
-              stop(event);
-              onToggleWishlist(product.id);
-            }}
-          >
-            <HeartIcon filled={product.isLiked} />
-          </IconButton>
+          />
         ) : null}
 
         {onAddToCart ? (
