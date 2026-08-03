@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
   useEffect,
@@ -11,6 +12,7 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { toggleLikeItem } from "@/app/(commerce)/likes/actions";
 import { isAuthRequiredError } from "@/app/(commerce)/likes/errors";
 import { commerceColors } from "@/commons/constants/color";
+import { QUERY_KEYS } from "@/commons/constants/query-keys";
 import { AUTH_URLS } from "@/commons/constants/url";
 import { cn } from "@/commons/utils/cn";
 import { toast } from "@/commons/utils/toast";
@@ -70,6 +72,7 @@ export const LikeButton = ({
   ...props
 }: LikeButtonProps) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isLiked, setIsLiked] = useState(initialIsLiked);
   const [isPending, startTransition] = useTransition();
 
@@ -90,6 +93,9 @@ export const LikeButton = ({
       try {
         const result = await toggleLikeItem(productId);
         setIsLiked(result.isLiked);
+        await queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.products.all,
+        });
         toast.success(
           result.isLiked
             ? "위시리스트에 추가했습니다."

@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDebouncedValue } from "@/commons/hooks/useDebouncedValue";
 import type { Product } from "@/components/commerce/types";
+import { getLikedProductIdSet } from "@/features/likes/api/getLikedProductIds";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 interface ProductRow {
@@ -14,7 +15,7 @@ interface ProductRow {
   rating_average: number | null;
 }
 
-function mapProductRow(row: ProductRow): Product {
+function mapProductRow(row: ProductRow, likedIds: Set<string>): Product {
   return {
     id: row.id,
     name: row.name,
@@ -23,6 +24,7 @@ function mapProductRow(row: ProductRow): Product {
     imageUrl: row.image_url ?? "",
     rating: row.rating_average != null ? Number(row.rating_average) : undefined,
     reviewCount: undefined,
+    isLiked: likedIds.has(row.id),
   };
 }
 
@@ -53,7 +55,13 @@ export function useProductSearch(keyword: string) {
         throw new Error(`상품 검색 실패: ${error.message}`);
       }
 
-      return (data as ProductRow[]).map(mapProductRow);
+      const rows = (data ?? []) as ProductRow[];
+      const likedIds = await getLikedProductIdSet(
+        supabase,
+        rows.map((row) => row.id),
+      );
+
+      return rows.map((row) => mapProductRow(row, likedIds));
     },
   });
 }

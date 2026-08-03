@@ -3,6 +3,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/commons/constants/query-keys";
 import type { Product } from "@/components/commerce/types";
+import { getLikedProductIdSet } from "@/features/likes/api/getLikedProductIds";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export const PAGE_SIZE = 12;
@@ -20,7 +21,7 @@ interface ProductRow {
   rating_average: number | null;
 }
 
-function mapProductRow(row: ProductRow): Product {
+function mapProductRow(row: ProductRow, likedIds: Set<string>): Product {
   return {
     id: row.id,
     name: row.name,
@@ -29,6 +30,7 @@ function mapProductRow(row: ProductRow): Product {
     imageUrl: row.image_url ?? "",
     rating: row.rating_average != null ? Number(row.rating_average) : undefined,
     reviewCount: undefined,
+    isLiked: likedIds.has(row.id),
   };
 }
 
@@ -65,8 +67,14 @@ export function useInfiniteProducts() {
         throw new Error(`상품 목록 조회 실패: ${error.message}`);
       }
 
+      const rows = (data ?? []) as ProductRow[];
+      const likedIds = await getLikedProductIdSet(
+        supabase,
+        rows.map((row) => row.id),
+      );
+
       return {
-        items: (data as ProductRow[]).map(mapProductRow),
+        items: rows.map((row) => mapProductRow(row, likedIds)),
       };
     },
     getNextPageParam: (lastPage, allPages) => {
