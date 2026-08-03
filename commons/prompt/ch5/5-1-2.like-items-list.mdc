@@ -1,0 +1,32 @@
+---
+alwaysApply: false
+---
+마이페이지 내 찜한 상품 모아보기 페이지를 구현해줘.
+
+0. 피그마 참고
+   - 피그마 채널: luxge42s
+   - 피그마 링크: https://www.figma.com/design/wi8a6by2DxDzvTOBu2yyUE/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=285-2616&t=Es1r1ptoKvMgZPeN-4
+   - 우선 피그마를 step-by-step으로 분석한 후, 최대한 동일하게 ui를 구현해줘
+
+1. 페이지 구조 (app/(commerce)/account/wishlist/page.tsx):
+   - Server Component로 구현
+   - 세션 확인 후 비로그인 사용자는 /login으로 redirect
+   - AccountSidebar와 메인 콘텐츠 영역으로 구성
+
+2. 데이터 조회:
+   - like_items와 products를 join하여 조회
+   - 페이지네이션 적용 (PAGE_SIZE = 5)
+   - created_at 기준 내림차순 정렬
+   - count를 통한 전체 개수 조회
+
+3. 컴포넌트 생성:
+   - LikeListSection: items가 비어있으면 LikeEmptyState, 있으면 LikeListTable
+   - LikeListTable: 테이블 형태로 Image, Name, Status, Price 표시
+   - LikeEmptyState: 빈 상태 UI 및 '상품 보러 가기' 버튼
+   - AccountPagination: 페이지네이션 컴포넌트
+
+4. 스타일:
+   - TailwindCSS + 디자인 토큰 사용
+   - 반응형 디자인 (모바일: 세로 배치, 데스크톱: 좌우 분할)
+
+참고: 기존 AccountSidebar 활용
