@@ -20,16 +20,12 @@ export interface ProductReviewsSectionProps
 
 export const ProductReviewsSection = ({
   productId,
-  currentUserId: currentUserIdProp,
   isSuperAdmin: isSuperAdminProp,
   className,
   ...props
 }: ProductReviewsSectionProps) => {
-  const { isAuthenticated, currentUserId, isSuperAdmin } = useAuth();
-
-  const resolvedUserId = currentUserIdProp ?? currentUserId;
+  const { isAuthenticated, isLoading, isSuperAdmin } = useAuth();
   const resolvedIsSuperAdmin = isSuperAdminProp ?? isSuperAdmin;
-  const canWriteReview = isAuthenticated || Boolean(resolvedUserId);
 
   return (
     <section
@@ -41,7 +37,7 @@ export const ProductReviewsSection = ({
       <ReviewSummaryDisplay />
       <CustomerReviewsHeader productId={productId} />
 
-      {canWriteReview ? (
+      {isLoading ? null : isAuthenticated ? (
         <ReviewForm productId={productId} />
       ) : (
         <div

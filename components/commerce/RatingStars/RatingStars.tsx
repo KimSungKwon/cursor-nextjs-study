@@ -1,6 +1,7 @@
 "use client";
 
-import type { HTMLAttributes } from "react";
+import { useState, type HTMLAttributes } from "react";
+import { FaStar } from "react-icons/fa";
 import { commerceColors } from "@/commons/constants/color";
 import { cn } from "@/commons/utils/cn";
 
@@ -13,33 +14,9 @@ export interface RatingStarsProps
   onChange?: (value: number) => void;
 }
 
-const StarIcon = ({
-  filled,
-  size,
-}: {
-  filled: boolean;
-  size: number;
-}) => {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 16 16"
-      aria-hidden
-      className="shrink-0"
-    >
-      <path
-        d="M8 1.5l1.76 3.56 3.93.57-2.84 2.77.67 3.92L8 10.48l-3.52 1.84.67-3.92L2.31 5.63l3.93-.57L8 1.5z"
-        fill={
-          filled
-            ? commerceColors.primary.light
-            : commerceColors.background.subtle
-        }
-      />
-    </svg>
-  );
-};
-
+/**
+ * 별점 표시/선택 (읽기 전용 또는 hover 미리보기 포함 선택)
+ */
 export const RatingStars = ({
   value,
   max = 5,
@@ -49,14 +26,21 @@ export const RatingStars = ({
   className,
   ...props
 }: RatingStarsProps) => {
+  const [hoverValue, setHoverValue] = useState<number | null>(null);
   const clamped = Math.min(Math.max(value, 0), max);
-  const filledCount = Math.floor(clamped);
+  const displayValue = !readOnly && hoverValue != null ? hoverValue : clamped;
+  const filledCount = Math.floor(displayValue);
 
   return (
     <div
       role={readOnly ? "img" : "radiogroup"}
       aria-label={readOnly ? `별점 ${clamped} / ${max}` : "별점 선택"}
       className={cn("inline-flex items-center gap-0.5", className)}
+      onMouseLeave={() => {
+        if (!readOnly) {
+          setHoverValue(null);
+        }
+      }}
       {...props}
     >
       {Array.from({ length: max }, (_, index) => {
@@ -64,7 +48,19 @@ export const RatingStars = ({
         const filled = starValue <= filledCount;
 
         if (readOnly) {
-          return <StarIcon key={starValue} filled={filled} size={size} />;
+          return (
+            <FaStar
+              key={starValue}
+              size={size}
+              color={
+                filled
+                  ? commerceColors.primary.light
+                  : commerceColors.background.subtle
+              }
+              aria-hidden
+              className="shrink-0"
+            />
+          );
         }
 
         return (
@@ -79,9 +75,20 @@ export const RatingStars = ({
               "focus-visible:outline-2 focus-visible:outline-offset-2",
             )}
             style={{ outlineColor: commerceColors.primary.main }}
+            onMouseEnter={() => setHoverValue(starValue)}
+            onFocus={() => setHoverValue(starValue)}
             onClick={() => onChange?.(starValue)}
           >
-            <StarIcon filled={filled} size={size} />
+            <FaStar
+              size={size}
+              color={
+                filled
+                  ? commerceColors.primary.light
+                  : commerceColors.background.subtle
+              }
+              aria-hidden
+              className="shrink-0"
+            />
           </button>
         );
       })}
