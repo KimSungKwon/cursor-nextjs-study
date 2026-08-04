@@ -1,6 +1,7 @@
 "use client";
 
 import type { HTMLAttributes } from "react";
+import { useAuth } from "@/commons/hooks/useAuth";
 import { cn } from "@/commons/utils/cn";
 import { ReviewCard } from "@/components/commerce/ReviewCard/ReviewCard";
 import { Button } from "@/components/ui/Button";
@@ -15,6 +16,7 @@ export const ReviewList = ({
   className,
   ...props
 }: ReviewListProps) => {
+  const { currentUserId } = useAuth();
   const {
     data,
     isLoading,
@@ -94,6 +96,10 @@ export const ReviewList = ({
         {reviews.map((review) => (
           <ReviewCard
             key={review.id}
+            reviewId={review.id}
+            productId={productId}
+            authorUserId={review.userId}
+            currentUserId={currentUserId}
             authorName={review.authorName}
             avatarUrl={review.avatarUrl}
             rating={review.rating}

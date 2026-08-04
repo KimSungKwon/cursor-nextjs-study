@@ -8,6 +8,7 @@ export const REVIEW_PAGE_SIZE = 5;
 
 export type ProductReviewItem = {
   id: string;
+  userId: string;
   rating: number;
   content: string;
   createdAt: string;
@@ -17,6 +18,7 @@ export type ProductReviewItem = {
 
 type ReviewRow = {
   id: string;
+  user_id: string;
   rating: number;
   content: string | null;
   created_at: string;
@@ -39,6 +41,7 @@ const mapAuthorName = (users: ReviewRow["users"]): string => {
 const mapReviewRow = (row: ReviewRow): ProductReviewItem => {
   return {
     id: row.id,
+    userId: row.user_id,
     rating: Number(row.rating),
     content: row.content?.trim() || "",
     createdAt: row.created_at,
@@ -61,7 +64,7 @@ export const useProductReviews = (productId: string) => {
 
       const { data, error } = await supabase
         .from("reviews")
-        .select("id, rating, content, created_at, users(display_name)")
+        .select("id, user_id, rating, content, created_at, users(display_name)")
         .eq("product_id", productId)
         .order("created_at", { ascending: false })
         .range(from, to);
