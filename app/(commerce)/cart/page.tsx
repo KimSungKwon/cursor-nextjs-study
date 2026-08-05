@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useCartStore } from "@/commons/store/cart-store";
 import { toast } from "@/commons/utils/toast";
 import { CartEmptyState } from "@/components/commerce/CartEmptyState/CartEmptyState";
@@ -14,7 +14,6 @@ const CartPage = () => {
   const removeItem = useCartStore((state) => state.removeItem);
   const hasHydrated = useCartStore((state) => state.hasHydrated);
   const setHasHydrated = useCartStore((state) => state.setHasHydrated);
-  const [shippingId, setShippingId] = useState("free");
 
   // persist rehydrate 완료 전에는 로딩 유지 (빈 화면으로 깜빡이지 않음)
   useEffect(() => {
@@ -25,7 +24,12 @@ const CartPage = () => {
     if (useCartStore.persist.hasHydrated()) {
       markReady();
     } else {
-      void useCartStore.persist.rehydrate().finally(markReady);
+      const rehydrateResult = useCartStore.persist.rehydrate();
+      if (rehydrateResult && typeof rehydrateResult.then === "function") {
+        void rehydrateResult.then(markReady);
+      } else {
+        markReady();
+      }
     }
 
     const fallbackId = window.setTimeout(markReady, 300);
@@ -129,11 +133,7 @@ const CartPage = () => {
             >
               Cart summary
             </h2>
-            <CartSummary
-              subtotal={totalAmount}
-              selectedShippingId={shippingId}
-              onShippingChange={setShippingId}
-            />
+            <CartSummary subtotal={totalAmount} />
           </aside>
         </div>
       )}
