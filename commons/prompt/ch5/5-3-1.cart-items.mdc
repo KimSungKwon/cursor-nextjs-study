@@ -1,0 +1,60 @@
+---
+alwaysApply: false
+---
+로컬 스토리지와 Zustand만 사용하던 장바구니를 실제 API와 데이터베이스로 연결해줘.
+
+1. 데이터베이스 참고:
+   - 경로: supabase/migrations/0001_init_schema.sql
+   - cart_items 테이블 참고:
+     * id: uuid primary key
+     * user_id: uuid references auth.users(id) on delete cascade
+     * product_id: uuid references public.products(id) on delete cascade
+     * quantity: integer not null default 1 check (quantity > 0)
+     * created_at, updated_at: timestamptz
+   - Unique Index: user_id + product_id
+   - RLS 정책: 본인 user_id = auth.uid()인 row만 관리 가능
+   - 위와 같이 작업되어있는지 참고. 아니라면 수정 필요
+
+2. Next.js API Route 생성:
+   - 경로: app/api/cart/route.ts
+   - GET: 현재 사용자의 장바구니 항목 조회
+   - POST: 장바구니에 상품 추가 (upsert 방식)
+   - PATCH: 장바구니 항목 수량 변경 (quantity <= 0이면 DELETE)
+   - DELETE: 장바구니에서 상품 제거
+   - 모든 메서드에서 세션 확인 (401 반환)
+   - cart_items join products로 상품 정보 포함
+   - DTO로 변환하여 반환
+   - *사용하지 않는 product api route는 삭제해줘
+
+3. Zustand Store 업데이트:
+   - 경로: commons/store/cart-store.ts
+   - syncWithServer: 서버와 장바구니 동기화
+   - addItem: Optimistic UI + API 호출
+   - updateItemQuantity: Optimistic UI + API 호출
+   - removeItem: Optimistic UI + API 호출
+   - 하이브리드 아키텍처:
+     * 로그인 상태: API + DB 기반
+     * 비로그인 상태: localStorage-only (API 401 무시)
+
+4. 장바구니 초기화 훅:
+   - 경로: commons/hooks/useInitCart.ts
+   - localStorage에서 복원
+   - 서버와 동기화 (로그인 상태라면)
+   - CommerceLayout에 CartInitializer 추가
+
+5. 장바구니 페이지 구현:
+   - 경로: app/(commerce)/cart/page.tsx
+   - Figma 디자인 기준 레이아웃
+   - CartItemRow 컴포넌트로 항목 표시
+   - CartSummary 컴포넌트로 요약 표시
+   - Empty State 처리
+   - 피그마 참고하고 기존 컴포넌트, 디자인 토큰 활용: https://www.figma.com/design/wi8a6by2DxDzvTOBu2yyUE/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=56-5593&t=lFhljgRc5Iucz9Ew-4
+   
+6. 상단 공통 헤더 수정:
+  - 상단에 장바구니 아이템이 있으면, 아이템 숫자를 장바구니 아이콘 옆에 badge 형태로 보여줘
+
+참고할 파일:
+- commons/store/cart-store.ts (기존 구현)
+- app/api/cart/route.ts (기존 구현)
+- supabase/migrations/0001_init_schema.sql (기존 구현)
+- Figma 디자인: https://www.figma.com/design/wi8a6by2DxDzvTOBu2yyUE/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=56-5593&t=lFhljgRc5Iucz9Ew-4
