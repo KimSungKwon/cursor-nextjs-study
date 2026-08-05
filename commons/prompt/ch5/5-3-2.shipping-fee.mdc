@@ -1,0 +1,24 @@
+---
+alwaysApply: false
+---
+장바구니 수량 변경과 삭제 기능을 API와 연동하고, 합계 계산 로직을 구현해줘.
+
+1. 배송비 계산 로직 수정:
+   - 경로: commons/store/cart-store.ts
+   - calcShippingFee 함수 추가:
+     * subtotal >= 50000 (5만원)이면 무료 배송 (0원)
+     * subtotal < 50000이면 2,500원
+   - 변경: subtotal >= 50000이면 0, 아니면 2500
+
+2. CartSummary 컴포넌트 확인:
+   - 경로: components/commerce/cart/CartSummary.tsx
+   - getSubtotal, getShippingFee, getTotal 사용 확인
+   - 배송비 표시 로직 수정 (0이면 "Free shipping", 아니면 문구 삭제 및 배송비 노출)
+   - Figma 디자인 기준 스타일링 확인
+
+참고할 파일:
+- commons/store/cart-store.ts (기존 구현)
+- app/api/cart/route.ts (기존 구현)
+- components/commerce/cart/CartItemRow.tsx (기존 구현)
+- components/commerce/cart/CartSummary.tsx (기존 구현)
+- Figma 디자인: https://www.figma.com/design/wi8a6by2DxDzvTOBu2yyUE/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=56-5593&t=lFhljgRc5Iucz9Ew-4
