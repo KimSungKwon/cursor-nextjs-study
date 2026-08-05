@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { COMMERCE_URLS } from "@/commons/constants/url";
 import { useInfiniteScroll } from "@/commons/hooks/useInfiniteScroll";
 import { useCartStore } from "@/commons/store/cart-store";
+import { toast } from "@/commons/utils/toast";
 import { HomeHeroSection } from "@/components/commerce/home/HomeHeroSection";
 import { ProductGrid } from "@/components/commerce/ProductGrid/ProductGrid";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -37,12 +38,20 @@ const CommerceHomePage = () => {
     const product = products.find((item) => item.id === productId);
     if (!product) return;
 
-    addItem({
+    toast.success("장바구니에 담았습니다.");
+
+    void addItem({
       id: product.id,
       name: product.name,
       price: product.price,
       imageUrl: product.imageUrl || null,
       salePrice: product.salePrice ?? null,
+    }).catch((error: unknown) => {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "장바구니 추가에 실패했습니다.",
+      );
     });
   };
 

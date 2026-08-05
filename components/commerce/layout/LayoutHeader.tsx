@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, type HTMLAttributes } from "react";
+import { FiShoppingBag } from "react-icons/fi";
 import { ACCOUNT_URLS, COMMERCE_URLS } from "@/commons/constants/url";
 import { useCartStore } from "@/commons/store/cart-store";
 import { cn } from "@/commons/utils/cn";
@@ -38,22 +39,9 @@ const UserIcon = () => (
   </svg>
 );
 
-const CartIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
-    <path
-      d="M7 8.5h10l-.8 9.2a1.5 1.5 0 0 1-1.5 1.3H9.3a1.5 1.5 0 0 1-1.5-1.3L7 8.5Z"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M9 8.5V7a3 3 0 0 1 6 0v1.5"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    />
-  </svg>
-);
+/** Figma Elements/Navigation/Cart Button — bag 24, badge 20 */
+const CART_ICON_SIZE = 24;
+const CART_BADGE_SIZE = 20;
 
 const MenuIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -75,6 +63,20 @@ const CloseIcon = () => (
       strokeLinecap="round"
     />
   </svg>
+);
+
+const CartBadge = ({ label }: { label: string }) => (
+  <span
+    className="inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--commerce-primary-main)] font-[family-name:var(--commerce-font-family-body)] font-bold text-[var(--commerce-text-inverse)]"
+    style={{
+      width: CART_BADGE_SIZE,
+      height: CART_BADGE_SIZE,
+      fontSize: 12,
+      lineHeight: "20px",
+    }}
+  >
+    {label}
+  </span>
 );
 
 export const LayoutHeader = ({
@@ -163,12 +165,8 @@ export const LayoutHeader = ({
                 : "장바구니"
             }
           >
-            <CartIcon />
-            {resolvedCartCount > 0 ? (
-              <span className="inline-flex size-5 items-center justify-center rounded-full bg-[var(--commerce-primary-main)] font-[family-name:var(--commerce-font-family-body)] text-xs font-bold leading-5 text-[var(--commerce-text-inverse)]">
-                {badgeLabel}
-              </span>
-            ) : null}
+            <FiShoppingBag size={CART_ICON_SIZE} strokeWidth={1.5} aria-hidden className="shrink-0" />
+            {resolvedCartCount > 0 ? <CartBadge label={badgeLabel} /> : null}
           </Link>
 
           <IconButton
@@ -228,12 +226,10 @@ export const LayoutHeader = ({
                 className="flex items-center gap-3 font-[family-name:var(--commerce-font-family-body)] text-base text-[var(--commerce-text-secondary)]"
                 onClick={() => setMenuOpen(false)}
               >
-                <CartIcon />
+                <FiShoppingBag size={CART_ICON_SIZE} strokeWidth={1.5} aria-hidden className="shrink-0" />
                 장바구니
                 {resolvedCartCount > 0 ? (
-                  <span className="inline-flex size-5 items-center justify-center rounded-full bg-[var(--commerce-primary-main)] text-xs font-bold text-[var(--commerce-text-inverse)]">
-                    {badgeLabel}
-                  </span>
+                  <CartBadge label={badgeLabel} />
                 ) : null}
               </Link>
             </li>

@@ -1,9 +1,6 @@
 "use client";
 
 import { useState, type HTMLAttributes } from "react";
-import { useRouter } from "next/navigation";
-import { AUTH_URLS } from "@/commons/constants/url";
-import { AuthRequiredError } from "@/commons/errors/AuthRequiredError";
 import { useCartStore } from "@/commons/store/cart-store";
 import type { ProductDetail } from "@/commons/types/product";
 import { cn } from "@/commons/utils/cn";
@@ -24,38 +21,39 @@ export const AddToCartSection = ({
   className,
   ...props
 }: AddToCartSectionProps) => {
-  const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
   const [quantity, setQuantity] = useState(1);
+  const [isAdding, setIsAdding] = useState(false);
 
   const isSoldOut = product.status === "sold_out";
 
   const handleAddToCart = () => {
-    try {
-      addItem(
-        {
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          imageUrl: product.image_url,
-          salePrice: product.salePrice ?? null,
-          status: product.status,
-        },
-        quantity,
-      );
-      toast.success("장바구니에 담았습니다.");
-    } catch (error) {
-      if (error instanceof AuthRequiredError) {
-        router.push(AUTH_URLS.LOGIN);
-        return;
-      }
+    if (isAdding || isSoldOut) return;
 
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "장바구니 추가에 실패했습니다.",
-      );
-    }
+    setIsAdding(true);
+    toast.success("장바구니에 담았습니다.");
+
+    void addItem(
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.image_url,
+        salePrice: product.salePrice ?? null,
+        status: product.status,
+      },
+      quantity,
+    )
+      .catch((error: unknown) => {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "장바구니 추가에 실패했습니다.",
+        );
+      })
+      .finally(() => {
+        setIsAdding(false);
+      });
   };
 
   return (
@@ -68,7 +66,7 @@ export const AddToCartSection = ({
           value={quantity}
           min={1}
           size="md"
-          disabled={isSoldOut}
+          disabled={isSoldOut || isAdding}
           onChange={setQuantity}
         />
         <LikeButton
@@ -82,8 +80,9 @@ export const AddToCartSection = ({
         type="button"
         variant="solid"
         size="lg"
-        className="h-[52px] w-full"
-        disabled={isSoldOut}
+        className="w-full"
+        loading={isAdding}
+        disabled={isSoldOut || isAdding}
         onClick={handleAddToCart}
       >
         {isSoldOut ? "Sold Out" : "Add to Cart"}
