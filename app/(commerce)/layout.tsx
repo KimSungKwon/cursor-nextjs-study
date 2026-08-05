@@ -1,3 +1,4 @@
+import { CartInitializer } from "@/components/commerce/CartInitializer";
 import { LayoutFooter } from "@/components/commerce/layout/LayoutFooter";
 import { LayoutHeader } from "@/components/commerce/layout/LayoutHeader";
 import { SearchOverlay } from "@/features/search/components/SearchOverlay";
@@ -9,6 +10,7 @@ const CommerceLayout = ({
 }>) => {
   return (
     <div className="flex min-h-screen flex-col bg-[var(--commerce-background-default)]">
+      <CartInitializer />
       <LayoutHeader />
       <main className="flex flex-1 flex-col">{children}</main>
       <LayoutFooter />

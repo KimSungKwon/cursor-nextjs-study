@@ -18,24 +18,37 @@ export interface CartItem {
 // addItem에 전달되는 상품 정보 (quantity 제외)
 export type CartProductInput = Omit<CartItem, "quantity">;
 
+export type SyncWithServerOptions = {
+  /** true면 로컬 항목을 서버에 합산(POST)한 뒤 GET. 로그인 직후 1회만 사용 */
+  mergeLocal?: boolean;
+};
+
 export interface CartState {
   items: CartItem[];
   totalQuantity: number;
   totalAmount: number;
-  addItem: (product: CartProductInput, quantity?: number) => void;
-  updateItemQuantity: (productId: string, quantity: number) => void;
-  removeItem: (productId: string) => void;
+  hasHydrated: boolean;
+  setHasHydrated: (value: boolean) => void;
+  setItems: (items: CartItem[]) => void;
+  syncWithServer: (options?: SyncWithServerOptions) => Promise<void>;
+  addItem: (product: CartProductInput, quantity?: number) => Promise<void>;
+  updateItemQuantity: (productId: string, quantity: number) => Promise<void>;
+  removeItem: (productId: string) => Promise<void>;
   clear: () => void;
 }
 
 const STORAGE_KEY = "commerce_cart_v1";
+const CART_API = "/api/cart";
 
-// 항목의 실제 적용 단가 (salePrice 우선, 없으면 price)
+type CartApiResponse = {
+  items?: CartItem[];
+  error?: string;
+};
+
 function getEffectivePrice(item: CartItem): number {
   return item.salePrice ?? item.price;
 }
 
-// items를 기반으로 총 수량/총 금액을 재계산
 function calculateTotals(items: CartItem[]): {
   totalQuantity: number;
   totalAmount: number;
@@ -50,67 +63,228 @@ function calculateTotals(items: CartItem[]): {
   );
 }
 
+function normalizeItems(items: CartItem[]): CartItem[] {
+  return items.map((item) => ({
+    ...item,
+    price: Number(item.price),
+    salePrice: item.salePrice == null ? null : Number(item.salePrice),
+    quantity: Number(item.quantity),
+    imageUrl: item.imageUrl ?? null,
+  }));
+}
+
+async function cartFetch(
+  method: "GET" | "POST" | "PATCH" | "DELETE",
+  body?: Record<string, unknown>,
+  productId?: string,
+): Promise<{ status: number; data: CartApiResponse }> {
+  const url =
+    method === "DELETE" && productId
+      ? `${CART_API}?productId=${encodeURIComponent(productId)}`
+      : CART_API;
+
+  const response = await fetch(url, {
+    method,
+    credentials: "same-origin",
+    headers:
+      body && method !== "GET"
+        ? { "Content-Type": "application/json" }
+        : undefined,
+    body: body && method !== "GET" ? JSON.stringify(body) : undefined,
+  });
+
+  let data: CartApiResponse = {};
+  try {
+    data = (await response.json()) as CartApiResponse;
+  } catch {
+    data = {};
+  }
+
+  return { status: response.status, data };
+}
+
+function applyLocalAdd(
+  items: CartItem[],
+  product: CartProductInput,
+  quantity: number,
+): CartItem[] {
+  const existing = items.find((item) => item.id === product.id);
+  if (existing) {
+    return items.map((item) =>
+      item.id === product.id
+        ? { ...item, quantity: item.quantity + quantity }
+        : item,
+    );
+  }
+  return [...items, { ...product, quantity }];
+}
+
+function applyLocalQuantity(
+  items: CartItem[],
+  productId: string,
+  quantity: number,
+): CartItem[] {
+  if (quantity <= 0) {
+    return items.filter((item) => item.id !== productId);
+  }
+  return items.map((item) =>
+    item.id === productId ? { ...item, quantity } : item,
+  );
+}
+
 export const useCartStore = create<CartState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       items: [],
       totalQuantity: 0,
       totalAmount: 0,
+      hasHydrated: false,
 
-      // 상품 추가: 동일 id가 있으면 수량만 증가, 없으면 새 항목 추가
-      addItem: (product, quantity = 1) =>
-        set((state) => {
-          // 잘못된 수량 방어
-          if (!Number.isFinite(quantity) || quantity <= 0) {
-            return state;
+      setHasHydrated: (value) => set({ hasHydrated: value }),
+
+      setItems: (items) => {
+        const normalized = normalizeItems(items);
+        set({ items: normalized, ...calculateTotals(normalized) });
+      },
+
+      syncWithServer: async (options) => {
+        const mergeLocal = options?.mergeLocal === true;
+
+        if (mergeLocal) {
+          const localItems = get().items;
+          for (const item of localItems) {
+            const { status, data } = await cartFetch("POST", {
+              productId: item.id,
+              quantity: item.quantity,
+            });
+            if (status === 401) {
+              return;
+            }
+            if (status >= 400) {
+              throw new Error(
+                data.error ?? "장바구니 서버 동기화에 실패했습니다.",
+              );
+            }
           }
+        }
 
-          const existing = state.items.find((item) => item.id === product.id);
+        const { status, data } = await cartFetch("GET");
+        if (status === 401) {
+          return;
+        }
+        if (status >= 400) {
+          throw new Error(data.error ?? "장바구니 조회에 실패했습니다.");
+        }
 
-          const items = existing
-            ? state.items.map((item) =>
-                item.id === product.id
-                  ? { ...item, quantity: item.quantity + quantity }
-                  : item,
-              )
-            : [...state.items, { ...product, quantity }];
+        get().setItems(data.items ?? []);
+      },
 
-          return { items, ...calculateTotals(items) };
-        }),
+      addItem: async (product, quantity = 1) => {
+        if (!Number.isFinite(quantity) || quantity <= 0) {
+          return;
+        }
 
-      // 수량 변경: 0 이하가 되면 항목 제거
-      updateItemQuantity: (productId, quantity) =>
-        set((state) => {
-          const items =
-            quantity <= 0
-              ? state.items.filter((item) => item.id !== productId)
-              : state.items.map((item) =>
-                  item.id === productId ? { ...item, quantity } : item,
-                );
+        const previous = get().items;
+        const optimistic = applyLocalAdd(previous, product, quantity);
+        set({ items: optimistic, ...calculateTotals(optimistic) });
 
-          return { items, ...calculateTotals(items) };
-        }),
+        const { status, data } = await cartFetch("POST", {
+          productId: product.id,
+          quantity,
+        });
 
-      // 특정 항목 제거
-      removeItem: (productId) =>
-        set((state) => {
-          const items = state.items.filter((item) => item.id !== productId);
-          return { items, ...calculateTotals(items) };
-        }),
+        if (status === 401) {
+          return;
+        }
 
-      // 장바구니 비우기
+        if (status >= 400) {
+          set({ items: previous, ...calculateTotals(previous) });
+          throw new Error(data.error ?? "장바구니 추가에 실패했습니다.");
+        }
+
+        if (data.items) {
+          get().setItems(data.items);
+        }
+      },
+
+      updateItemQuantity: async (productId, quantity) => {
+        const previous = get().items;
+        const optimistic = applyLocalQuantity(previous, productId, quantity);
+        set({ items: optimistic, ...calculateTotals(optimistic) });
+
+        const { status, data } = await cartFetch("PATCH", {
+          productId,
+          quantity,
+        });
+
+        if (status === 401) {
+          return;
+        }
+
+        if (status >= 400) {
+          set({ items: previous, ...calculateTotals(previous) });
+          throw new Error(data.error ?? "장바구니 수량 변경에 실패했습니다.");
+        }
+
+        if (data.items) {
+          get().setItems(data.items);
+        }
+      },
+
+      removeItem: async (productId) => {
+        const previous = get().items;
+        const optimistic = previous.filter((item) => item.id !== productId);
+        set({ items: optimistic, ...calculateTotals(optimistic) });
+
+        const { status, data } = await cartFetch(
+          "DELETE",
+          undefined,
+          productId,
+        );
+
+        if (status === 401) {
+          return;
+        }
+
+        if (status >= 400) {
+          set({ items: previous, ...calculateTotals(previous) });
+          throw new Error(data.error ?? "장바구니 삭제에 실패했습니다.");
+        }
+
+        if (data.items) {
+          get().setItems(data.items);
+        }
+      },
+
       clear: () => set({ items: [], totalQuantity: 0, totalAmount: 0 }),
     }),
     {
       name: STORAGE_KEY,
-      // items만 저장하고, 복원 시 합계는 재계산해 데이터 정합성 유지
       partialize: (state) => ({ items: state.items }),
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          const { totalQuantity, totalAmount } = calculateTotals(state.items);
-          state.totalQuantity = totalQuantity;
-          state.totalAmount = totalAmount;
+      onRehydrateStorage: () => (state, error) => {
+        // rehydrate 직후 합계·hydrate 플래그를 동기 반영 (set 호출은 microtask로 구독 보장)
+        const totals =
+          !error && state
+            ? calculateTotals(state.items)
+            : { totalQuantity: 0, totalAmount: 0 };
+
+        if (!error && state) {
+          state.totalQuantity = totals.totalQuantity;
+          state.totalAmount = totals.totalAmount;
+          state.hasHydrated = true;
         }
+
+        queueMicrotask(() => {
+          useCartStore.setState({
+            hasHydrated: true,
+            ...(!error && state
+              ? {
+                  totalQuantity: totals.totalQuantity,
+                  totalAmount: totals.totalAmount,
+                }
+              : {}),
+          });
+        });
       },
     },
   ),
