@@ -23,6 +23,24 @@ export type SyncWithServerOptions = {
   mergeLocal?: boolean;
 };
 
+/** 무료 배송 기준 금액 (5만원) */
+export const FREE_SHIPPING_THRESHOLD = 50_000;
+
+/** 기본 배송비 */
+export const DEFAULT_SHIPPING_FEE = 2_500;
+
+/**
+ * 소계 기준 배송비 계산
+ * - subtotal >= 50,000 → 0원 (무료)
+ * - subtotal < 50,000 → 2,500원
+ */
+export function calcShippingFee(subtotal: number): number {
+  if (!Number.isFinite(subtotal) || subtotal <= 0) {
+    return 0;
+  }
+  return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : DEFAULT_SHIPPING_FEE;
+}
+
 export interface CartState {
   items: CartItem[];
   totalQuantity: number;
@@ -30,6 +48,10 @@ export interface CartState {
   hasHydrated: boolean;
   setHasHydrated: (value: boolean) => void;
   setItems: (items: CartItem[]) => void;
+  /** 상품 소계 (totalAmount와 동일) */
+  getSubtotal: () => number;
+  getShippingFee: () => number;
+  getTotal: () => number;
   syncWithServer: (options?: SyncWithServerOptions) => Promise<void>;
   addItem: (product: CartProductInput, quantity?: number) => Promise<void>;
   updateItemQuantity: (productId: string, quantity: number) => Promise<void>;
@@ -145,6 +167,15 @@ export const useCartStore = create<CartState>()(
       setItems: (items) => {
         const normalized = normalizeItems(items);
         set({ items: normalized, ...calculateTotals(normalized) });
+      },
+
+      getSubtotal: () => get().totalAmount,
+
+      getShippingFee: () => calcShippingFee(get().totalAmount),
+
+      getTotal: () => {
+        const subtotal = get().totalAmount;
+        return subtotal + calcShippingFee(subtotal);
       },
 
       syncWithServer: async (options) => {
