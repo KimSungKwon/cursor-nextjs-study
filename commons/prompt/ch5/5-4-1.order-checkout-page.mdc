@@ -1,0 +1,51 @@
+---
+alwaysApply: false
+---
+"결제 페이지와 가격 계산 검증을 구현해줘.
+
+1. Checkout 페이지 구현:
+
+   - 경로: app/(commerce)/checkout/page.tsx
+   - Server Component로 구현
+   - 세션 확인 및 장바구니 조회
+   - lineItems 계산 (hidden 상품 제외)
+   - 가격 계산 (subtotal, shipping, discount, total)
+   - 사용자 기본 정보 조회
+   - CheckoutForm에 props 전달
+
+2. CheckoutForm 컴포넌트 구현:
+
+   - 경로: components/commerce/CheckoutForm.tsx
+   - Client Component로 구현
+   - 좌측: Contact Information + Shipping Address + Payment method
+   - 우측: OrderSummary (sticky)
+   - 폼 검증 및 제출 로직
+   - 사용자 기본 정보를 기본값으로 설정
+   - 피그마 참고해서 step-by-step 구조 분석 후 디자인 유사하게 작업: https://www.figma.com/design/wi8a6by2DxDzvTOBu2yyUE/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=59-10897&t=ZDRkgvPrGBUyfYmY-4
+
+3. OrderSummary 컴포넌트 구현:
+
+   - 경로: components/commerce/OrderSummary.tsx
+   - 우측 패널에 sticky로 배치
+   - 주문 항목 리스트 (썸네일, 이름, 수량, 가격)
+   - 합계 정보 (Shipping, Subtotal, Discount, Total)
+   - 배송비가 0이면 'Free' 표시
+
+4. Supabase 주문 스키마 확인:
+
+   - 0001_init_schema.sql 참고 (orders, order_items)
+   - orders 테이블 구조 확인
+   - order_items 테이블 구조 확인
+   - 주문 데이터 매핑 설계
+
+5. 가격 계산 검증:
+   - 서버에서 가격 재계산
+   - 클라이언트 가격과 서버 가격 비교
+   - 불일치 시 에러 처리
+
+참고할 파일:
+
+- app/(commerce)/checkout/page.tsx (해당 페이지에 구현)
+- components/commerce/CheckoutForm.tsx (새로 구현)
+- components/commerce/OrderSummary.tsx (새로 구현)
+- Figma 디자인: https://www.figma.com/design/wi8a6by2DxDzvTOBu2yyUE/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=59-10897&t=ZDRkgvPrGBUyfYmY-4
