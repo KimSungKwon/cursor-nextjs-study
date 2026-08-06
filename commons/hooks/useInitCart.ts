@@ -29,7 +29,12 @@ export const useInitCart = () => {
       markHydrated();
     } else {
       // 일부 환경에서 onFinishHydration이 누락될 수 있어 강제 rehydrate
-      void useCartStore.persist.rehydrate().then(markHydrated);
+      const rehydrateResult = useCartStore.persist.rehydrate();
+      if (rehydrateResult && typeof rehydrateResult.then === "function") {
+        void rehydrateResult.then(markHydrated);
+      } else {
+        markHydrated();
+      }
     }
 
     // 최종 폴백: 다음 틱에도 미완료면 화면이 멈추지 않도록 표시
