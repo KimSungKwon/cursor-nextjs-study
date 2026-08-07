@@ -1,19 +1,28 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { HiOutlineCreditCard } from "react-icons/hi2";
 import type {
   CheckoutLineItem,
   CheckoutPricing,
 } from "@/app/(commerce)/checkout/checkout-data";
-import { placeOrder } from "@/app/(commerce)/checkout/actions";
+import { findOrCreateOrder } from "@/app/(commerce)/checkout/actions";
+import { getPublicEnv } from "@/commons/config/env";
 import { ACCOUNT_URLS } from "@/commons/constants/url";
-import { useCartStore } from "@/commons/store/cart-store";
 import { commerceColors } from "@/commons/constants/color";
 import { commerceTypography } from "@/commons/constants/typography";
+import {
+  isValidTossPhone,
+  loadCheckoutOrderId,
+  normalizePhoneForToss,
+  saveCheckoutOrderId,
+} from "@/commons/utils/order";
 import { toast } from "@/commons/utils/toast";
 import { OrderSummary } from "@/components/commerce/OrderSummary";
+import {
+  TossPayment,
+  type TossPaymentHandle,
+} from "@/components/commerce/TossPayment";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
@@ -28,6 +37,7 @@ export type CheckoutFormProps = {
   lineItems: CheckoutLineItem[];
   pricing: CheckoutPricing;
   defaultValues: CheckoutDefaultValues;
+  customerKey: string;
 };
 
 type FormState = {
@@ -59,7 +69,11 @@ function validateForm(form: FormState): FormErrors {
 
   if (!form.firstName.trim()) errors.firstName = "이름을 입력해 주세요.";
   if (!form.lastName.trim()) errors.lastName = "성을 입력해 주세요.";
-  if (!form.phone.trim()) errors.phone = "전화번호를 입력해 주세요.";
+  if (!form.phone.trim()) {
+    errors.phone = "전화번호를 입력해 주세요.";
+  } else if (!isValidTossPhone(form.phone)) {
+    errors.phone = "휴대폰 번호는 숫자 10~11자리로 입력해 주세요.";
+  }
   if (!form.email.trim()) {
     errors.email = "이메일을 입력해 주세요.";
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
@@ -77,15 +91,16 @@ function validateForm(form: FormState): FormErrors {
 
 /**
  * 결제 폼 (Contact + Shipping + Payment) + 우측 OrderSummary
- * Figma Checkout node 59:10897 구조 참고
+ * Place Order → findOrCreateOrder → 토스 결제창
  */
 export const CheckoutForm = ({
   lineItems,
   pricing,
   defaultValues,
+  customerKey,
 }: CheckoutFormProps) => {
-  const router = useRouter();
-  const setItems = useCartStore((state) => state.setItems);
+  const tossRef = useRef<TossPaymentHandle>(null);
+  const { tossPayments, siteUrl } = getPublicEnv();
 
   const [form, setForm] = useState<FormState>({
     firstName: defaultValues.firstName,
@@ -125,11 +140,16 @@ export const CheckoutForm = ({
       return;
     }
 
+    if (!tossRef.current?.ready) {
+      toast.error("결제 모듈을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
+      return;
+    }
+
     setIsSubmitting(true);
     setErrors({});
 
     try {
-      const result = await placeOrder({
+      const result = await findOrCreateOrder({
         contact: {
           firstName: form.firstName,
           lastName: form.lastName,
@@ -144,6 +164,7 @@ export const CheckoutForm = ({
           zip: form.zip,
         },
         expectedPricing: pricing,
+        existingOrderId: loadCheckoutOrderId() ?? undefined,
       });
 
       if (!result.ok) {
@@ -152,13 +173,28 @@ export const CheckoutForm = ({
         return;
       }
 
-      setItems([]);
-      toast.success("주문이 완료되었습니다.");
-      // 결제완료 페이지는 이후 단계에서 구현
-      router.push(ACCOUNT_URLS.ORDERS);
-      router.refresh();
-    } catch {
-      toast.error("주문 처리 중 오류가 발생했습니다.");
+      saveCheckoutOrderId(result.orderId);
+
+      const origin =
+        typeof window !== "undefined" ? window.location.origin : siteUrl;
+
+      await tossRef.current.requestPayment({
+        orderId: result.tossOrderId,
+        orderName: result.orderName,
+        amount: result.amount,
+        customerName: `${form.firstName} ${form.lastName}`.trim(),
+        customerEmail: form.email.trim(),
+        customerMobilePhone: normalizePhoneForToss(form.phone),
+        successUrl: `${origin}${ACCOUNT_URLS.CHECKOUT_SUCCESS}?dbOrderId=${result.orderId}`,
+        failUrl: `${origin}${ACCOUNT_URLS.CHECKOUT_FAIL}?dbOrderId=${result.orderId}`,
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "결제 요청 중 오류가 발생했습니다.";
+      setErrors({ form: message });
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -166,6 +202,12 @@ export const CheckoutForm = ({
 
   return (
     <div className="flex w-full flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
+      <TossPayment
+        ref={tossRef}
+        clientKey={tossPayments.clientKey}
+        customerKey={customerKey}
+      />
+
       <form
         id="checkout-form"
         onSubmit={handleSubmit}

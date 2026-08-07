@@ -102,6 +102,7 @@ const CheckoutPage = async () => {
       <CheckoutForm
         lineItems={lineItems}
         pricing={pricing}
+        customerKey={session.id}
         defaultValues={{
           firstName,
           lastName,
