@@ -12,6 +12,7 @@
     "db:run-auth-users-profile": "tsx scripts/run-auth-users-profile.ts",
     "db:run-reviews-unique": "tsx scripts/run-reviews-unique.ts",
     "db:run-cart-unique": "tsx scripts/run-cart-unique.ts",
+    "db:run-orders-payments-rls": "tsx scripts/run-orders-payments-rls.ts",
     "db:seed-products": "tsx scripts/seed-products.ts",
     "db:seed-reviews": "tsx scripts/seed-reviews.ts",
     "storybook": "node scripts/run-storybook.js dev -p 6006",
