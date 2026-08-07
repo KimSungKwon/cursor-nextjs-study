@@ -1,0 +1,36 @@
+---
+alwaysApply: false
+---
+"TossPayments 연동과 테스트 결제 플로우를 구현해줘.
+
+1. TossPayment 컴포넌트 구현:
+   - 경로: components/commerce/TossPayment.tsx
+   - TossPayments SDK 스크립트 동적 로드
+   - SDK 초기화 (window.TossPayments(clientKey, customerKey))
+   - requestPayment 함수 구현 (ref를 통해 외부에서 호출 가능)
+   - ready 상태 관리
+
+2. 주문 생성 Server Action 수정:
+   - 경로: app/(commerce)/checkout/actions.ts
+   - findOrCreateOrder 함수에서 payments 테이블에 pending 결제 데이터 생성
+   - orders 테이블에 toss_order_id 저장
+
+3. CheckoutForm 컴포넌트 수정:
+   - 경로: components/commerce/CheckoutForm.tsx
+   - TossPayment 컴포넌트 통합
+   - handleSubmit에서 findOrCreateOrder 호출 후 requestPayment 호출
+   - 주문 ID를 sessionStorage에 저장
+
+4. 주문/결제 데이터 관계:
+   - orders 테이블: 주문 정보 (status, payment_status, toss_order_id)
+   - payments 테이블: 결제 트랜잭션 정보 (status, provider, method)
+   - 주문 생성 시: orders.status='pending', payments.status='pending'
+   - 결제 완료 후: orders.status='paid', payments.status='succeeded'
+   - RLS 설정: 본인 주문/결제 데이터 생성/수정 할 수 있도록 수정
+   - 성공/실패 페이지는 다음에 구현 예정. 지금은 성공/실패 결과를 JSON 형태로 화면에 보여주는 정도까지 구현
+
+참고할 파일:
+- components/commerce/TossPayment.tsx (새로 구현)
+- app/(commerce)/checkout/actions.ts (기존 구현)
+- components/commerce/CheckoutForm.tsx (기존 구현)
+- commons/utils/order.ts (주문 유틸 함수 새로 구현)"
