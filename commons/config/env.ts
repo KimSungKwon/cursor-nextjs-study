@@ -4,13 +4,20 @@ export interface SupabaseEnv {
   secretKey?: string; // 서버 전용
 }
 
+export interface TossPaymentsEnv {
+  clientKey: string;
+  secretKey?: string; // 서버 전용
+}
+
 export interface PublicEnv {
   supabase: Omit<SupabaseEnv, "secretKey">; // secretKey 뺴기
   siteUrl: string;
+  tossPayments: Omit<TossPaymentsEnv, "secretKey">;
 }
 
 export interface ServerEnv extends PublicEnv {
   supabase: Required<SupabaseEnv>; // secretKey도 필수
+  tossPayments: Required<TossPaymentsEnv>;
 }
 
 function validateEnvVar(name: string, value: string | undefined): string {
@@ -34,12 +41,20 @@ export function getPublicEnv(): PublicEnv {
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   );
 
+  const tossClientKey = validateEnvVar(
+    "NEXT_PUBLIC_TOSS_CLIENT_KEY",
+    process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY
+  );
+
   return {
     supabase: {
       url,
       publishableKey,
     },
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+    tossPayments: {
+      clientKey: tossClientKey,
+    },
   };
 }
 
@@ -50,12 +65,20 @@ export function getServerEnv(): ServerEnv {
     "SUPABASE_SECRET_KEY",
     process.env.SUPABASE_SECRET_KEY
   );
+  const tossSecretKey = validateEnvVar(
+    "TOSS_SECRET_KEY",
+    process.env.TOSS_SECRET_KEY
+  );
 
   return {
     ...publicEnv,
     supabase: {
       ...publicEnv.supabase,
       secretKey,
+    },
+    tossPayments: {
+      ...publicEnv.tossPayments,
+      secretKey: tossSecretKey,
     },
   };
 }

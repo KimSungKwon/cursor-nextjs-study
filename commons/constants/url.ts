@@ -29,6 +29,8 @@ export const ACCOUNT_URLS = {
   REVIEWS: "/account/reviews",
   WISHLIST: "/account/wishlist",
   CHECKOUT: "/checkout",
+  CHECKOUT_SUCCESS: "/checkout/success",
+  CHECKOUT_FAIL: "/checkout/fail",
   ORDER_COMPLETE: "/order-complete",
 } as const;
 
@@ -76,6 +78,8 @@ export const ROUTE_CONFIG_MAP = {
   [ACCOUNT_URLS.REVIEWS]: "member",
   [ACCOUNT_URLS.WISHLIST]: "member",
   [ACCOUNT_URLS.CHECKOUT]: "member",
+  [ACCOUNT_URLS.CHECKOUT_SUCCESS]: "member",
+  [ACCOUNT_URLS.CHECKOUT_FAIL]: "member",
   [ACCOUNT_URLS.ORDER_COMPLETE]: "member",
 
   [ADMIN_URLS.DASHBOARD]: "admin",
