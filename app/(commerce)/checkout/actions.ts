@@ -410,6 +410,7 @@ export type CompletePaymentResult =
       tossOrderId: string;
       paymentKey: string;
       amount: number;
+      paidAt?: string;
       alreadyCompleted?: boolean;
     }
   | { ok: false; error: string; code?: string };
@@ -583,7 +584,9 @@ export async function completeCheckoutPayment(
       console.error("장바구니 비우기 실패:", clearError.message);
     }
 
-    // 페이지 렌더 중 호출되므로 revalidatePath 사용 금지
+    revalidatePath(COMMERCE_URLS.CART);
+    revalidatePath(ACCOUNT_URLS.CHECKOUT);
+    revalidatePath(ACCOUNT_URLS.ORDERS);
 
     return {
       ok: true,
@@ -591,6 +594,7 @@ export async function completeCheckoutPayment(
       tossOrderId: input.tossOrderId,
       paymentKey: input.paymentKey,
       amount: storedAmount,
+      paidAt,
     };
   } catch (error) {
     const message =
@@ -690,7 +694,8 @@ export async function failCheckoutPayment(
       };
     }
 
-    // 페이지 렌더 중 호출되므로 revalidatePath 사용 금지
+    revalidatePath(ACCOUNT_URLS.ORDERS);
+    revalidatePath(ACCOUNT_URLS.CHECKOUT);
 
     return {
       ok: true,
