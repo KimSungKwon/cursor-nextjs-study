@@ -1,0 +1,27 @@
+---
+alwaysApply: false
+---
+Figma에 연결된 상태에서, 결제 성공·실패 페이지를 디자인에 맞춰 구현해줘.
+
+1) Figma에서 디자인 확인
+- https://www.figma.com/design/wi8a6by2DxDzvTOBu2yyUE/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=61-11644&t=JfqG0yu3PuBfd1uU-4
+- 레이아웃, 색상, 타이포(제목/본문/버튼), 여백, 아이콘 구성을 정리해줘.
+- 피그마 채널: i72ee2jq
+
+2) 적용할 코드 위치
+- 성공 페이지: app/(commerce)/checkout/success/CheckoutSuccessClient.tsx
+- 실패 페이지: app/(commerce)/checkout/fail/CheckoutFailClient.tsx
+- 기존: components/ui/, components/commerce/ 확인해서 재사용 가능한 버튼·카드·타이포 컴포넌트가 있으면 사용해줘.
+
+3) 디자인 토큰
+- commerce 디자인 토큰만 사용: commerceColors, commerceTypography, var(--commerce-*)
+- line-height는 비율이면 1.5처럼 단위 없이, 픽셀이면 24px처럼 px 포함해서 작성해줘.
+
+4) 구현 요구사항
+- 성공: 로딩/성공/에러 상태에 맞는 제목·설명·(선택) 주문 정보 요약·결과 JSON 또는 요약 영역. 디자인에 "다시 쇼핑하기" 등 CTA가 있으면 COMMERCE_URLS 사용해서 링크 연결.
+- 실패: 실패 제목·에러 메시지(code, message)·orderId 표시·(선택) "다시 결제" / "장바구니로" 버튼. 디자인에 맞춰 배치.
+- 접근성: 버튼/링크에 aria, focus-visible 고려해줘.
+- 아이콘은 react-icons 사용해줘.
+
+5) 출력
+- Figma에서 읽은 구조를 짧게 요약한 뒤, CheckoutSuccessClient와 CheckoutFailClient를 디자인에 맞게 수정한 코드를 작성해줘.
