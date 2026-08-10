@@ -1,0 +1,23 @@
+---
+alwaysApply: false
+---
+
+# public.users에 image_url 컬럼 추가 마이그레이션
+
+이 프로젝트의 Supabase 마이그레이션 규칙을 따라, **기존 public.users 테이블에만** `image_url` 컬럼을 추가해줘.
+
+## 규칙 (프로젝트 .cursor/rules/03-migration.mdc 준수)
+- Supabase CLI나 SQL Editor 직접 실행 금지.
+- **TypeScript 스크립트**로 실행: `.env.local`에서 `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY`(또는 Management API용 토큰) 로드 후, Management API 또는 서버에서 실행 가능한 스크립트로 SQL 실행.
+- 기존 패턴: `scripts/migrations/NNNN-name.ts` + `supabase/migrations/NNNN_name.sql` 조합. package.json에 `"db:add-users-image-url": "tsx scripts/migrations/0013-add-users-image-url.ts"` 형태로 스크립트 추가.
+
+## SQL 요구사항
+- `public.users` 테이블에 nullable 컬럼 추가:
+  - 이름: `image_url`
+  - 타입: `TEXT`
+  - NULL 허용 (기존 행에 값 없어도 됨).
+- COMMENT ON COLUMN으로 용도 설명 추가 (예: 프로필 이미지 URL 또는 data URL 저장).
+
+## 스크립트 요구사항
+- env 검증 후, 해당 SQL 파일을 읽어 한 번에 실행.
+- 실패 시 에러 메시지 출력. CLI 명령어 대신 `yarn db:add-users-image-url` 실행 안내만 포함.
