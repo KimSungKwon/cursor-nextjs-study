@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState, useEffect, type ChangeEvent } from "react";
+import { HiOutlineCamera } from "react-icons/hi2";
+import { updateProfileImage } from "@/app/(commerce)/account/actions";
 import { commerceColors } from "@/commons/constants/color";
 import { commerceTypography } from "@/commons/constants/typography";
 import {
@@ -11,11 +13,13 @@ import {
   AUTH_URLS,
 } from "@/commons/constants/url";
 import { useAuth } from "@/commons/hooks/useAuth";
+import { toast } from "@/commons/utils/toast";
 import { cn } from "@/commons/utils/cn";
 
 export type AccountSidebarProps = {
   displayName: string | null;
   email: string;
+  imageUrl?: string | null;
 };
 
 type NavItem = {
@@ -33,32 +37,48 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Log Out", action: "logout" },
 ];
 
-const CameraIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
-    <path
-      d="M2.5 5.5h2l1-1.5h5l1 1.5h2A1.5 1.5 0 0 1 14 7v5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 12V7a1.5 1.5 0 0 1 1.5-1.5Z"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinejoin="round"
-    />
-    <circle cx="8" cy="9.5" r="2" stroke="currentColor" strokeWidth="1.2" />
-  </svg>
-);
+const MAX_FILE_BYTES = 1024 * 1024; // 1MB
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+        return;
+      }
+      reject(new Error("이미지를 읽지 못했습니다."));
+    };
+    reader.onerror = () => reject(new Error("이미지를 읽지 못했습니다."));
+    reader.readAsDataURL(file);
+  });
+}
 
 /**
  * 마이페이지 좌측 메뉴 (피그마 MENU 65:4450)
+ * 아바타 클릭 시 프로필 이미지를 data URL로 업로드·저장
  */
 export const AccountSidebar = ({
   displayName,
   email,
+  imageUrl = null,
 }: AccountSidebarProps) => {
   const pathname = usePathname();
   const router = useRouter();
   const { signOut } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(imageUrl);
+
+  useEffect(() => {
+    setPreviewUrl(imageUrl);
+  }, [imageUrl]);
 
   const resolvedName = displayName?.trim() || email.split("@")[0] || "User";
   const initial = resolvedName.charAt(0).toUpperCase();
+  const avatarSrc = previewUrl?.trim() || null;
 
   const handleLogout = async () => {
     setIsSigningOut(true);
@@ -71,6 +91,46 @@ export const AccountSidebar = ({
     }
   };
 
+  const openFilePicker = () => {
+    if (isUploading) return;
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("이미지 파일만 선택할 수 있습니다.");
+      return;
+    }
+
+    if (file.size > MAX_FILE_BYTES) {
+      toast.error("이미지 용량은 1MB 이하로 선택해 주세요.");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const dataUrl = await readFileAsDataUrl(file);
+      const result = await updateProfileImage(dataUrl);
+
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+
+      setPreviewUrl(result.imageUrl);
+      toast.success("프로필 이미지가 저장되었습니다.");
+      router.refresh();
+    } catch {
+      toast.error("프로필 이미지 업로드 중 오류가 발생했습니다.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <aside
       className="flex w-full shrink-0 flex-col items-center rounded-lg px-4 pb-10 pt-10 sm:w-[262px]"
@@ -79,28 +139,68 @@ export const AccountSidebar = ({
     >
       <div className="mb-10 flex flex-col items-center gap-1.5">
         <div className="relative size-[80px]">
-          <div
-            className="flex size-full items-center justify-center overflow-hidden rounded-full"
-            style={{ backgroundColor: commerceColors.primary.main }}
-            aria-hidden
+          <button
+            type="button"
+            onClick={openFilePicker}
+            disabled={isUploading}
+            className="relative flex size-full items-center justify-center overflow-hidden rounded-full transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-60"
+            style={{
+              backgroundColor: commerceColors.primary.main,
+              outlineColor: commerceColors.primary.main,
+            }}
+            aria-label="프로필 이미지 변경"
           >
-            <span
-              className="text-2xl font-semibold text-[var(--commerce-text-inverse)]"
-              style={{ fontFamily: commerceTypography.fontFamily.body }}
-            >
-              {initial}
-            </span>
-          </div>
-          <span
-            className="absolute bottom-0 right-0 flex size-[30px] items-center justify-center rounded-full border-2 border-white"
+            {avatarSrc ? (
+              // eslint-disable-next-line @next/next/no-img-element -- data URL 프로필
+              <img
+                src={avatarSrc}
+                alt=""
+                className="size-full object-cover"
+              />
+            ) : (
+              <span
+                className="text-2xl font-semibold text-[var(--commerce-text-inverse)]"
+                style={{ fontFamily: commerceTypography.fontFamily.body }}
+                aria-hidden
+              >
+                {initial}
+              </span>
+            )}
+            {isUploading ? (
+              <span
+                className="absolute inset-0 flex items-center justify-center bg-black/40"
+                aria-hidden
+              >
+                <span className="size-5 animate-spin rounded-full border-2 border-white border-r-transparent" />
+              </span>
+            ) : null}
+          </button>
+
+          <button
+            type="button"
+            onClick={openFilePicker}
+            disabled={isUploading}
+            className="absolute bottom-0 right-0 flex size-[30px] items-center justify-center rounded-full border-2 border-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none"
             style={{
               backgroundColor: commerceColors.primary.main,
               color: commerceColors.text.inverse,
+              outlineColor: commerceColors.primary.main,
             }}
-            aria-hidden
+            aria-label="프로필 이미지 선택"
           >
-            <CameraIcon />
-          </span>
+            <HiOutlineCamera size={16} aria-hidden />
+          </button>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={(event) => {
+              void handleFileChange(event);
+            }}
+            tabIndex={-1}
+          />
         </div>
 
         <p

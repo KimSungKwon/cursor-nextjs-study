@@ -21,6 +21,7 @@ type UsersProfileRow = {
   display_name: string | null;
   email: string;
   role: string;
+  image_url: string | null;
 };
 
 type LikedProductRow = {
@@ -155,10 +156,14 @@ async function getUserProfile(
   supabase: SupabaseServerClient,
   userId: string,
   fallbackEmail: string,
-): Promise<{ displayName: string | null; email: string }> {
+): Promise<{
+  displayName: string | null;
+  email: string;
+  imageUrl: string | null;
+}> {
   const { data: profile, error: profileError } = await supabase
     .from("users")
-    .select("display_name, email, role")
+    .select("display_name, email, role, image_url")
     .eq("id", userId)
     .single();
 
@@ -171,6 +176,7 @@ async function getUserProfile(
         : fallbackEmail,
     displayName:
       !profileError && profileRow ? profileRow.display_name : null,
+    imageUrl: !profileError && profileRow ? profileRow.image_url : null,
   };
 }
 
@@ -227,6 +233,7 @@ const WishlistPage = async ({ searchParams }: WishlistPageProps) => {
         <AccountSidebar
           displayName={profile.displayName}
           email={profile.email}
+          imageUrl={profile.imageUrl}
         />
         <div className="min-w-0 flex-1">
           <LikeListSection

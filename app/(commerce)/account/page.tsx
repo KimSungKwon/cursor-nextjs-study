@@ -10,6 +10,7 @@ type UsersProfileRow = {
   display_name: string | null;
   email: string;
   role: string;
+  image_url: string | null;
 };
 
 const AccountPage = async () => {
@@ -25,7 +26,7 @@ const AccountPage = async () => {
 
   const { data: profile, error: profileError } = await supabase
     .from("users")
-    .select("display_name, email, role")
+    .select("display_name, email, role, image_url")
     .eq("id", user.id)
     .single();
 
@@ -40,6 +41,9 @@ const AccountPage = async () => {
     !profileError && profileRow
       ? profileRow.display_name
       : null;
+
+  const imageUrl =
+    !profileError && profileRow ? profileRow.image_url : null;
 
   return (
     <div className="mx-auto w-full max-w-[1440px] px-4 pb-16 sm:px-6 lg:px-10 xl:px-40">
@@ -60,7 +64,11 @@ const AccountPage = async () => {
       </header>
 
       <div className="flex flex-col gap-10 lg:flex-row lg:gap-16 xl:gap-[72px]">
-        <AccountSidebar displayName={displayName} email={email} />
+        <AccountSidebar
+          displayName={displayName}
+          email={email}
+          imageUrl={imageUrl}
+        />
         <div className="min-w-0 flex-1 lg:pt-0">
           <AccountDetailsForm
             initialDisplayName={displayName}
