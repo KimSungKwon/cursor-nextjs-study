@@ -1,0 +1,25 @@
+---
+alwaysApply: false
+---
+# 5-5-1 마이페이지 내 정보 개선 — 프로필 이미지(data URL) 업로드
+
+마이페이지에서 프로필 이미지를 data URL로 업로드하는 기능만 추가해줘.
+
+## 1. 사전 조건
+- `public.users`에 `image_url` 컬럼이 있어야 함. 없으면 먼저 "User image_url 마이그레이션" 프롬프트로 추가한 뒤 진행해줘.
+
+## 2. 적용 위치
+- **사이드바 아바타:** `components/commerce/AccountSidebar/AccountSidebar.tsx`
+  - 현재: 80x80 원형 영역 + 이니셜 표시 + 우하단 카메라 아이콘 (클릭 동작 없음)
+  - 요구: 아바타 영역(또는 카메라 아이콘) 클릭 시 프로필 이미지를 **data URL**로 설정·저장할 수 있게 해줘.
+
+## 3. 기능 요구사항
+- 클릭 시 `input type="file" accept="image/*"`로 이미지 선택 (또는 클릭 가능한 영역에 hidden input 연결).
+- 선택한 파일을 **Data URL**(Base64)로 읽어서:
+  - `public.users`의 `image_url` 컬럼에 해당 문자열을 저장 (현재 로그인 유저의 행만 업데이트).
+- 아바타 표시 우선순위: `image_url`이 있으면 `<img src={image_url} />`로 표시, 없으면 기존처럼 이니셜 표시.
+- 디자인 토큰: `commerceColors`, `commerceTypography`, `var(--commerce-*)`만 사용. 아이콘은 react-icons 사용.
+
+## 4. 제약
+- 이번 단계에서는 **data URL 저장만** 구현 (파일 업로드 → Storage URL 방식은 별도 과제로 둠).
+- 기존 컴포넌트 구조·Account 페이지 라우트 유지. `components/commerce/types.ts`, `types/supabase.ts`의 User/프로필 타입에 `image_url` 반영해줘.
