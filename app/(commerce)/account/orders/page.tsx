@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { AccountSidebar } from "@/components/account/AccountSidebar/AccountSidebar";
-import { OrdersTable } from "@/components/account/OrdersTable";
+import { OrdersTable } from "@/components/account/orders/OrdersTable";
 import {
   ORDERS_PAGE_SIZE,
   isOrderStatus,

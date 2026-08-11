@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { AccountPagination } from "@/components/account/AccountPagination/AccountPagination";
-import { OrderEmptyState } from "@/components/account/OrderEmptyState";
+import { OrderEmptyState } from "@/components/account/orders/OrderEmptyState";
+import { OrderStatusBadge } from "@/components/account/orders/OrderStatusBadge";
 import {
   formatOrderCode,
   formatOrderDate,
-  formatOrderStatusLabel,
   type AccountOrder,
-  type OrderStatus,
 } from "@/components/account/orders/types";
 import { commerceColors } from "@/commons/constants/color";
 import { commerceTypography } from "@/commons/constants/typography";
@@ -22,16 +21,9 @@ export type OrdersTableProps = {
   className?: string;
 };
 
-const statusColor: Record<OrderStatus, string> = {
-  paid: commerceColors.semantic.success,
-  pending: commerceColors.semantic.warning,
-  canceled: commerceColors.semantic.error,
-  refunded: commerceColors.text.tertiary,
-};
-
 /**
  * 주문 내역 테이블 (Order ID / Date / Status / Price)
- * 행 클릭 시 주문 상세로 이동 (상세 페이지는 별도)
+ * 행 클릭 시 주문 상세로 이동
  */
 export const OrdersTable = ({
   items,
@@ -99,7 +91,6 @@ export const OrdersTable = ({
               <tbody>
                 {items.map((order) => {
                   const href = ACCOUNT_URLS.ORDER_DETAIL(order.id);
-                  const statusLabel = formatOrderStatusLabel(order.status);
 
                   return (
                     <tr
@@ -135,18 +126,9 @@ export const OrdersTable = ({
                         <Link
                           href={href}
                           className="inline-block focus-visible:outline-2 focus-visible:outline-offset-2"
-                          style={{
-                            fontFamily: commerceTypography.fontFamily.body,
-                            fontSize:
-                              commerceTypography.caption.md.regular.fontSize,
-                            fontWeight: commerceTypography.fontWeight.regular,
-                            lineHeight: "22px",
-                            color: statusColor[order.status],
-                            outlineColor: commerceColors.primary.main,
-                          }}
-                          aria-label={`주문 상태 ${statusLabel}`}
+                          style={{ outlineColor: commerceColors.primary.main }}
                         >
-                          {statusLabel}
+                          <OrderStatusBadge status={order.status} />
                         </Link>
                       </td>
                       <td className="py-6 align-middle">
