@@ -1,0 +1,47 @@
+---
+alwaysApply: false
+---
+주문 상세 페이지를 구현해줘.
+
+1. 주문 상세 페이지 구현:
+   - 경로: app/(commerce)/account/orders/[orderId]/page.tsx
+   - Server Component로 주문 상세 정보 조회
+   - Dynamic Route: /account/orders/[orderId]
+   - 세션 확인 및 권한 체크
+   - 주문이 없거나 권한이 없으면 404 처리 (notFound)
+   - 왼쪽: AccountSidebar (이전 강의에서 구현)
+   - 오른쪽: 주문 상세 정보 섹션들
+
+2. getOrderDetail 함수 구현:
+   - 경로: app/(commerce)/account/orders/[orderId]/queries.ts
+   - orders 테이블 조회 (user_id로 권한 체크)
+   - order_items 테이블 조회
+   - payments 테이블 조회 (가장 최근 1건)
+   - OrderDetail 인터페이스로 데이터 조합
+
+3. 주문 상세 페이지 UI 구성:
+   - Breadcrumb (My Account > Orders > Order Number)
+   - Order Header (주문 번호, 날짜, 주문 상태 배지)
+   - Order Summary (Items total, Shipping, Discount, Total)
+   - Products in this order (상품 목록 테이블)
+   - Shipping Information (배송 정보)
+   - Payment Information (결제 정보)
+
+4. 기존 컴포넌트 활용:
+   - AccountSidebar: 이전 강의에서 구현한 사이드바 재사용
+   - OrderStatusBadge: 주문 상태 배지 표시
+   - PaymentStatusBadge: 결제 상태 배지 표시
+   - 기존 마이페이지의 룩앤필과 일관성 유지
+
+5. 디자인 토큰 활용:
+   - --commerce-* prefix 색상 사용
+   - 기존 마이페이지와 동일한 스타일 적용
+   - 카드 형태로 각 섹션 구성
+
+참고할 파일:
+- app/(commerce)/account/orders/[orderId]/page.tsx (기존 구현)
+- app/(commerce)/account/orders/[orderId]/queries.ts (기존 구현)
+- components/account/AccountSidebar/AccountSidebar.tsx (이전 강의)
+- components/account/OrderStatusBadge.tsx (기존 구현)
+- components/account/PaymentStatusBadge.tsx (기존 구현)
+- commons/constants/url.ts (URL 상수)"
