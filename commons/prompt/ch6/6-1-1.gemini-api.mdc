@@ -1,0 +1,33 @@
+---
+alwaysApply: false
+---
+
+lib/ai/gemini.ts 에 아래 3개 함수를 구현해줘
+
+### 1. generateGeminiText
+- 파라미터: prompt: string, model: string = "gemini-2.5-flash"
+- GoogleGenAI 클라이언트 생성 후 generateContent 호출
+- contents는 role: "user", parts: [{ text: prompt }] 형태
+- response.text 추출해서 반환
+- 텍스트 없으면 에러 throw
+- 반환 타입: Promise<string>
+
+### 2. generateGeminiTextWithSystemPrompt
+- 파라미터: systemPrompt: string, userPrompt: string, model: string = "gemini-2.5-flash"
+- systemPrompt와 userPrompt를 개행으로 결합해서 단일 프롬프트로 만들기
+- generateContent 호출 후 response.text 반환
+- 텍스트 없으면 에러 throw
+- 반환 타입: Promise<string>
+
+### 3. generateGeminiTextStream
+- 파라미터: prompt: string, model: string = "gemini-2.5-flash"
+- generateContentStream 사용
+- AsyncGenerator<string, void, unknown> 형태로 chunk.text yield
+- 반환 타입: AsyncGenerator
+
+## 조건
+- TypeScript로 작성
+- GEMINI_API_KEY는 process.env.GEMINI_API_KEY로 참조
+- 각 함수마다 JSDoc 주석 추가
+- 모든 함수 export
+- 환경변수 적용: GEMINI_API_KEY
