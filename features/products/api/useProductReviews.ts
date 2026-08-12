@@ -16,26 +16,39 @@ export type ProductReviewItem = {
   avatarUrl?: string;
 };
 
+type ReviewAuthorRow = {
+  display_name: string | null;
+  image_url: string | null;
+};
+
 type ReviewRow = {
   id: string;
   user_id: string;
   rating: number;
   content: string | null;
   created_at: string;
-  users:
-    | { display_name: string | null }
-    | { display_name: string | null }[]
-    | null;
+  users: ReviewAuthorRow | ReviewAuthorRow[] | null;
 };
 
 type ReviewsPage = {
   items: ProductReviewItem[];
 };
 
+const normalizeAuthor = (
+  users: ReviewRow["users"],
+): ReviewAuthorRow | null => {
+  if (!users) return null;
+  return Array.isArray(users) ? (users[0] ?? null) : users;
+};
+
 const mapAuthorName = (users: ReviewRow["users"]): string => {
-  if (!users) return "Anonymous";
-  const user = Array.isArray(users) ? users[0] : users;
+  const user = normalizeAuthor(users);
   return user?.display_name?.trim() || "Anonymous";
+};
+
+const mapAvatarUrl = (users: ReviewRow["users"]): string | undefined => {
+  const imageUrl = normalizeAuthor(users)?.image_url?.trim();
+  return imageUrl || undefined;
 };
 
 const mapReviewRow = (row: ReviewRow): ProductReviewItem => {
@@ -46,6 +59,7 @@ const mapReviewRow = (row: ReviewRow): ProductReviewItem => {
     content: row.content?.trim() || "",
     createdAt: row.created_at,
     authorName: mapAuthorName(row.users),
+    avatarUrl: mapAvatarUrl(row.users),
   };
 };
 
@@ -64,7 +78,9 @@ export const useProductReviews = (productId: string) => {
 
       const { data, error } = await supabase
         .from("reviews")
-        .select("id, user_id, rating, content, created_at, users(display_name)")
+        .select(
+          "id, user_id, rating, content, created_at, users(display_name, image_url)",
+        )
         .eq("product_id", productId)
         .order("created_at", { ascending: false })
         .range(from, to);

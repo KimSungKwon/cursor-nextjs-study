@@ -1,11 +1,13 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState, useEffect, type ChangeEvent } from "react";
 import { HiOutlineCamera } from "react-icons/hi2";
 import { updateProfileImage } from "@/app/(commerce)/account/actions";
 import { commerceColors } from "@/commons/constants/color";
+import { QUERY_KEYS } from "@/commons/constants/query-keys";
 import { commerceTypography } from "@/commons/constants/typography";
 import {
   ACCOUNT_URLS,
@@ -65,6 +67,7 @@ export const AccountSidebar = ({
 }: AccountSidebarProps) => {
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { signOut } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -123,6 +126,9 @@ export const AccountSidebar = ({
 
       setPreviewUrl(result.imageUrl);
       toast.success("프로필 이미지가 저장되었습니다.");
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.products.all,
+      });
       router.refresh();
     } catch {
       toast.error("프로필 이미지 업로드 중 오류가 발생했습니다.");
