@@ -1,3 +1,66 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+마이페이지 리뷰 내역 페이지를 구현해줘.
+
+1. Reviews 페이지 구현:
+   - 경로: app/(commerce)/account/reviews/page.tsx
+   - Server Component로 현재 로그인한 사용자의 리뷰 목록을 페이지네이션으로 조회
+   - searchParams에서 page 쿼리 파라미터 파싱 (기본값 1)
+   - Supabase reviews 테이블 조회:
+     - user_id로 필터링해서 본인이 작성한 리뷰만 가져오기
+     - products 테이블과 join해서 상품 이름, 이미지 가져오기
+   - 왼쪽: components/commerce/AccountSidebar (기존 구현)
+     - activeItem=\"reviews\" 설정
+   - 오른쪽: MyReviewsSection (새로운 섹션 컴포넌트)
+   - 로그인하지 않은 경우 /login 으로 redirect
+   - Figma 마이페이지 레이아웃(Orders/Wishlist)와 동일한 여백/타이포 사용
+
+2. MyReviewsSection 컴포넌트 구현:
+   - 경로: components/commerce/MyReviewsSection/MyReviewsSection.tsx
+   - Props:
+     - reviews: 내 리뷰 목록(MyReviewItem[])
+     - totalPages: 전체 페이지 수
+     - currentPage: 현재 페이지 번호
+   - 상단 제목: 'Reviews' (commerceTypography.headline.h7 사용)
+   - 리뷰가 없을 때:
+     - MyReviewsEmptyState 컴포넌트 렌더링 (간단한 문구 + 상품 목록으로 이동 버튼)
+   - 리뷰가 있을 때:
+     - MyReviewListItem을 사용해 리스트 렌더링
+     - 하단에 AccountPagination 재사용
+       - basePath는 '/account/reviews'로 설정
+
+3. MyReviewListItem 컴포넌트 구현:
+   - 경로: components/commerce/MyReviewsSection/MyReviewListItem.tsx
+   - Props:
+     - review: Review 타입 + product 정보(id, name, imageUrl)
+   - 내부에서 ReviewCard(components/commerce/ReviewCard/ReviewCard.tsx) 재사용
+   - 상품 정보가 있으면:
+     - COMMERCE_URLS.PRODUCT_DETAIL(product.id)를 사용해서 상품 상세 URL 생성
+     - 전체 카드를 next/link Link로 감싸서 상품 상세로 이동 가능하게 하기
+   - currentUserId는 서버에서 주입해서 ReviewCard의 수정/삭제 버튼 노출이 올바르게 동작하도록 하기
+
+4. Supabase 쿼리 설계:
+   - orders 페이지의 페이지네이션 코드를 참고해서 동일한 패턴으로 구현
+   - reviews 테이블:
+     - select: id, rating, content, created_at, product_id
+     - products 테이블과 join: name, image_url
+     - eq('user_id', authUser.id)
+     - order('created_at', { ascending: false })
+     - range(from, to) + count: 'exact'로 totalCount 계산
+   - totalPages = Math.ceil(totalCount / PAGE_SIZE) 계산 후 AccountPagination에 전달
+
+5. 기존 컴포넌트/디자인 토큰 재사용:
+   - AccountSidebar: components/commerce/AccountSidebar/AccountSidebar.tsx
+   - AccountPagination: components/commerce/AccountPagination/AccountPagination.tsx
+   - ReviewCard, RatingStars: components/commerce/ReviewCard/ReviewCard.tsx, RatingStars.tsx
+   - commerceColors, commerceTypography를 사용해서 Orders/Wishlist와 동일한 룩앤필 적용
+
+참고할 파일:
+- app/(commerce)/account/orders/page.tsx (마이페이지 레이아웃/페이지네이션 패턴)
+- components/commerce/OrdersSection/OrdersSection.tsx (섹션 컴포넌트 패턴)
+- components/commerce/LikeListSection/LikeListSection.tsx (섹션 + Pagination 패턴)
+- components/commerce/ReviewCard/ReviewCard.tsx (리뷰 카드 UI)
+- features/reviews/api/useProductReviewsList.ts (reviews 테이블 쿼리 예시)
+- app/(commerce)/products/[productId]/review-actions.ts (리뷰 생성/수정/삭제 서버 액션)
+- commons/constants/url.ts (COMMERCE_URLS, ACCOUNT_URLS)
