@@ -1,0 +1,54 @@
+---
+alwaysApply: false
+---
+"상품 상세 페이지에 AI 리뷰 요약 섹션을 구현해줘.
+
+1. 서버 액션 구현:
+   - 경로: app/(commerce)/products/[productId]/review-summary-actions.ts
+   - 'use server' 지시자 사용
+   - 함수 목록:
+     A) getReviewSummary(productId)
+        - DB에서 review_summary 조회
+        - 없으면 null 반환
+     
+     B) generateAiReviewSummary(productId)
+        - admin 권한 확인 (checkAdminAccess 사용)
+        - 모든 리뷰 조회 (rating, content만 추출, NULL 필터링)
+        - generateFullReviewSummary 호출
+        - products.review_summary 업데이트
+        - revalidatePath 호출
+        - 성공/실패 결과 반환
+
+2. ReviewSummaryDisplay 컴포넌트 구현:
+   - 경로: components/commerce/product/ReviewSummaryDisplay.tsx
+   - Client Component ('use client')
+   - useEffect로 요약 조회
+   - 로딩 상태, 빈 상태 처리
+   - Summary, Positive Points, Negative Points, Keywords 표시
+   - 키워드는 태그 형태로 표시
+
+3. RegenerateSummaryButton 컴포넌트 구현:
+   - 경로: components/commerce/product/RegenerateSummaryButton.tsx
+   - Client Component ('use client')
+   - isAdmin prop으로 admin 여부 받기
+   - admin이 아니면 null 반환
+   - 버튼 클릭 시 generateAiReviewSummary 호출
+   - toast 메시지 표시
+   - 로딩 상태 관리
+
+4. 상품 상세 페이지 통합:
+   - ProductReviewsSection에 AI 리뷰 요약 섹션 추가
+   - checkAdminAccess로 admin 권한 확인
+   - RegenerateSummaryButton 조건부 표시
+   - Figma 디자인 참고: https://www.figma.com/design/D4FSoaSMyEH857s3Hqverw/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF?node-id=37-1912
+
+5. 디자인 토큰 활용:
+   - --commerce-* prefix 색상 사용
+   - Poppins (제목), Noto Sans KR (본문), Inter (라벨)
+   - Tailwind spacing 사용
+
+참고할 파일:
+- lib/ai/review-summary.ts (generateFullReviewSummary)
+- lib/ai/gemini.ts (Gemini API 래퍼)
+- lib/auth/admin.ts (checkAdminAccess)
+- app/(commerce)/products/[productId]/review-actions.ts (서버 액션 예시)
