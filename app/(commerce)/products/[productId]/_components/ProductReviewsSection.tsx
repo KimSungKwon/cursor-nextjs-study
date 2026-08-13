@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import type { HTMLAttributes } from "react";
+import { useState, type HTMLAttributes } from "react";
 import { AUTH_URLS } from "@/commons/constants/url";
 import { useAuth } from "@/commons/hooks/useAuth";
 import { cn } from "@/commons/utils/cn";
 import { ReviewForm } from "@/components/commerce/ReviewForm";
+import { RegenerateSummaryButton } from "@/components/commerce/product/RegenerateSummaryButton";
+import { ReviewSummaryDisplay } from "@/components/commerce/product/ReviewSummaryDisplay";
 import { Button } from "@/components/ui/Button";
 import { CustomerReviewsHeader } from "./CustomerReviewsHeader";
 import { ReviewList } from "./ReviewList";
-import { ReviewSummaryDisplay } from "./ReviewSummaryDisplay";
 
 export interface ProductReviewsSectionProps
   extends Omit<HTMLAttributes<HTMLElement>, "children"> {
@@ -24,8 +25,10 @@ export const ProductReviewsSection = ({
   className,
   ...props
 }: ProductReviewsSectionProps) => {
-  const { isAuthenticated, isLoading, isSuperAdmin } = useAuth();
+  const { isAuthenticated, isLoading, isAdmin, isSuperAdmin } = useAuth();
   const resolvedIsSuperAdmin = isSuperAdminProp ?? isSuperAdmin;
+  const resolvedIsAdmin = isSuperAdminProp ?? isAdmin;
+  const [summaryRefreshToken, setSummaryRefreshToken] = useState(0);
 
   return (
     <section
@@ -34,11 +37,30 @@ export const ProductReviewsSection = ({
       aria-label="상품 리뷰"
       {...props}
     >
-      <ReviewSummaryDisplay />
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-end">
+          <RegenerateSummaryButton
+            productId={productId}
+            isAdmin={resolvedIsAdmin}
+            onGenerated={() => {
+              setSummaryRefreshToken((token) => token + 1);
+            }}
+          />
+        </div>
+        <ReviewSummaryDisplay
+          productId={productId}
+          refreshToken={summaryRefreshToken}
+        />
+      </div>
       <CustomerReviewsHeader productId={productId} />
 
       {isLoading ? null : isAuthenticated ? (
-        <ReviewForm productId={productId} />
+        <ReviewForm
+          productId={productId}
+          onSuccess={() => {
+            setSummaryRefreshToken((token) => token + 1);
+          }}
+        />
       ) : (
         <div
           className={cn(

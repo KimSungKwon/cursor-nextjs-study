@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { isProductLiked } from "@/app/(commerce)/likes/actions";
 import { ProductDetail } from "@/components/commerce/ProductDetail/ProductDetail";
 import { getProductById } from "@/features/products/api/useProductDetail";
+import { checkAdminAccess } from "@/lib/auth/admin";
 import { ProductDetailTabs } from "./_components/ProductDetailTabs";
 import { ProductReviewsSection } from "./_components/ProductReviewsSection";
 
@@ -60,6 +61,7 @@ const ProductDetailPage = async ({ params }: ProductDetailPageProps) => {
 
   const liked = await isProductLiked(product.id);
   const productWithLike = { ...product, isLiked: liked };
+  const isAdmin = await checkAdminAccess();
 
   const additionalInfo =
     product.additional_info?.trim() || "추가 정보가 없습니다.";
@@ -81,7 +83,12 @@ const ProductDetailPage = async ({ params }: ProductDetailPageProps) => {
             {additionalInfo}
           </p>
         }
-        reviewsContent={<ProductReviewsSection productId={product.id} />}
+        reviewsContent={
+          <ProductReviewsSection
+            productId={product.id}
+            isSuperAdmin={isAdmin}
+          />
+        }
       />
     </div>
   );
