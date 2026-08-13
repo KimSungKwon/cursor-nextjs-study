@@ -15,11 +15,16 @@ import { Button } from "@/components/ui/Button";
 export type ReviewFormProps = {
   productId: string;
   className?: string;
+  onSuccess?: () => void;
 };
 
 const MIN_LEN = 10;
 
-export const ReviewForm = ({ productId, className }: ReviewFormProps) => {
+export const ReviewForm = ({
+  productId,
+  className,
+  onSuccess,
+}: ReviewFormProps) => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [rating, setRating] = useState(5);
@@ -54,6 +59,7 @@ export const ReviewForm = ({ productId, className }: ReviewFormProps) => {
       await queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.products.all,
       });
+      onSuccess?.();
       router.refresh();
     } catch (error) {
       if (isAuthRequiredError(error)) {

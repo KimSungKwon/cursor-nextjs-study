@@ -7,7 +7,12 @@ import {
   NotFoundError,
 } from "@/app/(commerce)/likes/errors";
 import { COMMERCE_URLS } from "@/commons/constants/url";
+import {
+  generateIncrementalReviewSummary,
+  type ReviewSummaryResult,
+} from "@/lib/ai/review-summary";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type CreateReviewInput = {
@@ -38,6 +43,10 @@ type ReviewOwnerRow = {
   id: string;
   user_id: string;
   product_id: string;
+};
+
+type ProductSummaryRow = {
+  review_summary: unknown;
 };
 
 function revalidateReviewPaths(productId: string): void {
@@ -73,6 +82,36 @@ function validateContent(content: string): void {
       `리뷰 내용은 최소 ${MIN_CONTENT_LENGTH}자 이상이어야 합니다.`,
     );
   }
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+function parseReviewSummary(value: unknown): ReviewSummaryResult | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  const { summary, positive_points, negative_points, keywords } = record;
+
+  if (
+    typeof summary !== "string" ||
+    !summary.trim() ||
+    !isStringArray(positive_points) ||
+    !isStringArray(negative_points) ||
+    !isStringArray(keywords)
+  ) {
+    return null;
+  }
+
+  return {
+    summary,
+    positive_points,
+    negative_points,
+    keywords,
+  };
 }
 
 async function getReviewOrThrow(
@@ -129,6 +168,58 @@ async function refreshProductRating(
       updated_at: new Date().toISOString(),
     } as never)
     .eq("id", productId);
+}
+
+/**
+ * 새 리뷰를 반영해 products.review_summary를 증분 업데이트한다.
+ * AI 실패해도 리뷰 등록 자체는 실패시키지 않는다.
+ */
+async function refreshProductReviewSummary(
+  productId: string,
+  newReview: { rating: number; content: string },
+): Promise<void> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("products")
+      .select("review_summary")
+      .eq("id", productId)
+      .maybeSingle();
+
+    if (error) {
+      console.error(
+        "[refreshProductReviewSummary] 기존 요약 조회 실패:",
+        error.message,
+      );
+      return;
+    }
+
+    const existingSummary = parseReviewSummary(
+      (data as ProductSummaryRow | null)?.review_summary,
+    );
+    const nextSummary = await generateIncrementalReviewSummary(
+      existingSummary,
+      newReview,
+    );
+
+    const service = createServiceClient();
+    const { error: updateError } = await service
+      .from("products")
+      .update({
+        review_summary: nextSummary,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", productId);
+
+    if (updateError) {
+      console.error(
+        "[refreshProductReviewSummary] 요약 저장 실패:",
+        updateError.message,
+      );
+    }
+  } catch (error) {
+    console.error("[refreshProductReviewSummary] 요약 갱신 실패:", error);
+  }
 }
 
 /**
@@ -190,6 +281,7 @@ export async function createReview(
   }
 
   await refreshProductRating(supabase, productId);
+  await refreshProductReviewSummary(productId, { rating, content });
   revalidateReviewPaths(productId);
 
   return { id: insertedRow.id };
