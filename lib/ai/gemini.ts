@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 
-const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_MODEL = "gemini-3.6-flash";
 
 function createGeminiClient(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -25,7 +25,7 @@ function extractTextOrThrow(text: string | undefined): string {
 /**
  * Gemini로 단일 텍스트를 생성한다.
  * @param prompt 사용자 프롬프트
- * @param model 사용할 모델 (기본: gemini-2.5-flash)
+ * @param model 사용할 모델 (기본: gemini-3.6-flash)
  * @returns 생성된 텍스트
  */
 export async function generateGeminiText(
@@ -50,7 +50,7 @@ export async function generateGeminiText(
  * 시스템 프롬프트와 사용자 프롬프트를 결합해 Gemini 텍스트를 생성한다.
  * @param systemPrompt 시스템 지시문
  * @param userPrompt 사용자 프롬프트
- * @param model 사용할 모델 (기본: gemini-2.5-flash)
+ * @param model 사용할 모델 (기본: gemini-3.6-flash)
  * @returns 생성된 텍스트
  */
 export async function generateGeminiTextWithSystemPrompt(
@@ -76,7 +76,7 @@ export async function generateGeminiTextWithSystemPrompt(
 /**
  * Gemini 스트리밍 응답을 chunk 단위로 yield한다.
  * @param prompt 사용자 프롬프트
- * @param model 사용할 모델 (기본: gemini-2.5-flash)
+ * @param model 사용할 모델 (기본: gemini-3.6-flash)
  * @yields 응답 텍스트 청크
  */
 export async function* generateGeminiTextStream(
