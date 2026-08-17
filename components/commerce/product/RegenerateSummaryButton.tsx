@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useTransition } from "react";
 import { FaMagic } from "react-icons/fa";
 import { generateAiReviewSummary } from "@/app/(commerce)/products/[productId]/review-summary-actions";
 import { toast } from "@/commons/utils/toast";
@@ -22,35 +22,34 @@ export const RegenerateSummaryButton = ({
   onGenerated,
 }: RegenerateSummaryButtonProps) => {
   const router = useRouter();
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   if (!isAdmin) {
     return null;
   }
 
-  const handleClick = async () => {
-    if (isGenerating) return;
+  const handleClick = () => {
+    if (isPending) return;
 
-    setIsGenerating(true);
-    try {
-      const result = await generateAiReviewSummary(productId);
-      if (!result.ok) {
-        toast.error(result.error);
-        return;
+    startTransition(async () => {
+      try {
+        const result = await generateAiReviewSummary(productId);
+        if (!result.ok) {
+          toast.error(result.error);
+          return;
+        }
+
+        toast.success("AI 리뷰 요약이 생성되었습니다.");
+        onGenerated?.();
+        router.refresh();
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "AI 리뷰 요약 생성에 실패했습니다.",
+        );
       }
-
-      toast.success("AI 리뷰 요약이 생성되었습니다.");
-      onGenerated?.();
-      router.refresh();
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "AI 리뷰 요약 생성에 실패했습니다.",
-      );
-    } finally {
-      setIsGenerating(false);
-    }
+    });
   };
 
   return (
@@ -58,13 +57,12 @@ export const RegenerateSummaryButton = ({
       type="button"
       variant="outline"
       size="sm"
-      loading={isGenerating}
+      loading={isPending}
+      disabled={isPending}
       leftIcon={<FaMagic size={14} aria-hidden />}
-      onClick={() => {
-        void handleClick();
-      }}
+      onClick={handleClick}
     >
-      {isGenerating ? "생성 중..." : "AI 리뷰 요약 생성"}
+      {isPending ? "재생성 중..." : "AI 리뷰 요약 생성"}
     </Button>
   );
 };
