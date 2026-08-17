@@ -5,14 +5,19 @@ import { useAuth } from "@/commons/hooks/useAuth";
 import { cn } from "@/commons/utils/cn";
 import { ReviewCard } from "@/components/commerce/ReviewCard/ReviewCard";
 import { Button } from "@/components/ui/Button";
-import { useProductReviews } from "@/features/products/api/useProductReviews";
+import {
+  useProductReviews,
+  type ProductReviewItem,
+} from "@/features/products/api/useProductReviews";
 
 export interface ReviewListProps extends HTMLAttributes<HTMLElement> {
   productId: string;
+  initialItems?: ProductReviewItem[];
 }
 
 export const ReviewList = ({
   productId,
+  initialItems,
   className,
   ...props
 }: ReviewListProps) => {
@@ -25,7 +30,7 @@ export const ReviewList = ({
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useProductReviews(productId);
+  } = useProductReviews(productId, initialItems);
 
   const reviews = data?.pages.flatMap((page) => page.items) ?? [];
 

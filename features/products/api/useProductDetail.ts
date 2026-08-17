@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type {
   ProductCategory,
   ProductDetail,
@@ -90,7 +91,7 @@ export function toProductDetail(product: ProductDetailData): ProductDetail {
  * Supabase products 테이블에서 상품 상세를 조회한다.
  * 없거나 hidden이면 null을 반환한다.
  */
-export async function getProductById(
+export const getProductById = cache(async function getProductById(
   productId: string,
 ): Promise<ProductDetailData | null> {
   const supabase = await createClient();
@@ -111,4 +112,4 @@ export async function getProductById(
   }
 
   return mapProductDetailRow(data as ProductDetailRow);
-}
+});

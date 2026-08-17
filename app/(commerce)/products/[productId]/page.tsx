@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { isProductLiked } from "@/app/(commerce)/likes/actions";
-import { ProductDetail } from "@/components/commerce/ProductDetail/ProductDetail";
+import { Suspense } from "react";
+import { ProductDetailSkeleton } from "@/components/ui/ProductDetailSkeleton";
+import { ReviewListSkeleton } from "@/components/ui/ReviewListSkeleton";
+import { ReviewSummarySkeleton } from "@/components/ui/ReviewSummarySkeleton";
 import { getProductById } from "@/features/products/api/useProductDetail";
-import { checkAdminAccess } from "@/lib/auth/admin";
-import { ProductDetailTabs } from "./_components/ProductDetailTabs";
-import { ProductReviewsSection } from "./_components/ProductReviewsSection";
+import { ProductHeroSection } from "./_components/ProductHeroSection";
+import { ProductTabsSection } from "./_components/ProductTabsSection";
 
 type ProductDetailPageProps = {
   params: Promise<{ productId: string }>;
@@ -51,45 +51,42 @@ export async function generateMetadata({
   };
 }
 
+function ProductTabsFallback() {
+  return (
+    <div className="w-full">
+      <div
+        className="flex gap-10 border-b pb-2"
+        style={{ borderColor: "var(--commerce-border-light)" }}
+        aria-hidden
+      >
+        <div
+          className="h-8 w-24 animate-pulse rounded"
+          style={{ backgroundColor: "var(--commerce-background-light)" }}
+        />
+        <div
+          className="h-8 w-36 animate-pulse rounded"
+          style={{ backgroundColor: "var(--commerce-background-light)" }}
+        />
+      </div>
+      <div className="flex flex-col gap-10 pt-10">
+        <ReviewSummarySkeleton />
+        <ReviewListSkeleton />
+      </div>
+    </div>
+  );
+}
+
 const ProductDetailPage = async ({ params }: ProductDetailPageProps) => {
   const { productId } = await params;
-  const product = await getProductById(productId);
-
-  if (!product) {
-    notFound();
-  }
-
-  const liked = await isProductLiked(product.id);
-  const productWithLike = { ...product, isLiked: liked };
-  const isAdmin = await checkAdminAccess();
-
-  const additionalInfo =
-    product.additional_info?.trim() || "추가 정보가 없습니다.";
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-4 py-8 sm:px-6 lg:px-10 xl:px-40">
-      <ProductDetail product={productWithLike} />
-      <ProductDetailTabs
-        additionalInfoContent={
-          <p
-            className="whitespace-pre-wrap text-[var(--commerce-text-tertiary)]"
-            style={{
-              fontFamily: "var(--commerce-body-md-regular-font-family)",
-              fontSize: "var(--commerce-body-md-regular-font-size)",
-              fontWeight: "var(--commerce-body-md-regular-font-weight)",
-              lineHeight: "26px",
-            }}
-          >
-            {additionalInfo}
-          </p>
-        }
-        reviewsContent={
-          <ProductReviewsSection
-            productId={product.id}
-            isSuperAdmin={isAdmin}
-          />
-        }
-      />
+      <Suspense fallback={<ProductDetailSkeleton />}>
+        <ProductHeroSection productId={productId} />
+      </Suspense>
+      <Suspense fallback={<ProductTabsFallback />}>
+        <ProductTabsSection productId={productId} />
+      </Suspense>
     </div>
   );
 };

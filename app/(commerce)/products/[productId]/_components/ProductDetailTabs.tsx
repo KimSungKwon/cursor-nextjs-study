@@ -13,12 +13,12 @@ export interface ProductDetailTabsProps {
 }
 
 const TABS: { id: ProductDetailTabId; label: string }[] = [
-  { id: "additional-info", label: "Additional Info" },
   { id: "reviews", label: "Reviews" },
+  { id: "additional-info", label: "Additional Info" }
 ];
 
 export const ProductDetailTabs = ({
-  defaultTab = "additional-info",
+  defaultTab = "reviews",
   additionalInfoContent,
   reviewsContent,
   className,
@@ -65,9 +65,10 @@ export const ProductDetailTabs = ({
       </div>
 
       <div role="tabpanel" className="pt-10">
-        {activeTab === "additional-info"
-          ? additionalInfoContent
-          : reviewsContent}
+        {activeTab === "reviews"
+          ? reviewsContent
+          : additionalInfoContent
+        }
       </div>
     </div>
   );

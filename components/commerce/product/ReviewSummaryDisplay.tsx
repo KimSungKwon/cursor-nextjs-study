@@ -1,67 +1,29 @@
 "use client";
 
-import { useEffect, useState, type HTMLAttributes, type ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import { FaCheck, FaRegThumbsDown, FaRegThumbsUp, FaRobot } from "react-icons/fa";
-import { getReviewSummary } from "@/app/(commerce)/products/[productId]/review-summary-actions";
 import { commerceColors } from "@/commons/constants/color";
 import { commerceTypography } from "@/commons/constants/typography";
 import { cn } from "@/commons/utils/cn";
 import type { ReviewSummaryResult } from "@/lib/ai/review-summary";
 
 export type ReviewSummaryDisplayProps = HTMLAttributes<HTMLElement> & {
-  productId: string;
-  refreshToken?: number;
+  summary: ReviewSummaryResult | null;
 };
 
 /**
  * 상품 AI 리뷰 요약 영역
  */
 export const ReviewSummaryDisplay = ({
-  productId,
-  refreshToken = 0,
+  summary,
   className,
   ...props
 }: ReviewSummaryDisplayProps) => {
-  const [summary, setSummary] = useState<ReviewSummaryResult | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const loadSummary = async () => {
-      setIsLoading(true);
-      try {
-        const result = await getReviewSummary(productId);
-        if (!cancelled) {
-          setSummary(result);
-        }
-      } catch {
-        if (!cancelled) {
-          setSummary(null);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    void loadSummary();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [productId, refreshToken]);
-
   return (
     <section
-      className={cn(
-        "rounded-lg p-6",
-        className,
-      )}
+      className={cn("rounded-lg p-6", className)}
       style={{ backgroundColor: `${commerceColors.background.subtle}80` }}
       aria-label="AI 리뷰 요약"
-      aria-busy={isLoading}
       {...props}
     >
       <div className="flex gap-4">
@@ -105,19 +67,7 @@ export const ReviewSummaryDisplay = ({
             ) : null}
           </div>
 
-          {isLoading ? (
-            <p
-              style={{
-                fontFamily: commerceTypography.fontFamily.body,
-                fontSize: commerceTypography.caption.md.regular.fontSize,
-                fontWeight: commerceTypography.fontWeight.regular,
-                lineHeight: "24px",
-                color: commerceColors.text.tertiary,
-              }}
-            >
-              AI 리뷰 요약을 불러오는 중...
-            </p>
-          ) : summary ? (
+          {summary ? (
             <div className="flex flex-col gap-5">
               <p
                 className="whitespace-pre-wrap"
@@ -170,7 +120,8 @@ export const ReviewSummaryDisplay = ({
                           backgroundColor: commerceColors.background.light,
                           color: commerceColors.text.secondary,
                           fontFamily: commerceTypography.fontFamily.body,
-                          fontSize: commerceTypography.caption.md.regular.fontSize,
+                          fontSize:
+                            commerceTypography.caption.md.regular.fontSize,
                           fontWeight: commerceTypography.fontWeight.medium,
                           lineHeight: "20px",
                         }}
