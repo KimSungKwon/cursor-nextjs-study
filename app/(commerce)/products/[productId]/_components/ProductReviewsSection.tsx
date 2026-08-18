@@ -31,7 +31,7 @@ export const ProductReviewsSection = ({
       {...props}
     >
       <Suspense fallback={<ReviewSummarySkeleton />}>
-        <ReviewSummarySection productId={productId} isAdmin={isSuperAdmin} />
+        <ReviewSummarySection productId={productId} />
       </Suspense>
       <CustomerReviewsHeader productId={productId} />
       <ReviewComposer productId={productId} />

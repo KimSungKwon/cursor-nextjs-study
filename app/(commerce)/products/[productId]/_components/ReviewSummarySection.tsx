@@ -1,11 +1,12 @@
-import { getReviewSummary } from "@/app/(commerce)/products/[productId]/review-summary-actions";
-import { RegenerateSummaryButton } from "@/components/commerce/product/RegenerateSummaryButton";
-import { ReviewSummaryDisplay } from "@/components/commerce/product/ReviewSummaryDisplay";
+import {
+  getReviewConfidenceStats,
+  getReviewSummary,
+} from "@/app/(commerce)/products/[productId]/review-summary-actions";
+import { EnhancedReviewSummary } from "@/app/(commerce)/products/[productId]/_components/EnhancedReviewSummary";
 import { checkAdminAccess } from "@/lib/auth/admin";
 
 export type ReviewSummarySectionProps = {
   productId: string;
-  isAdmin?: boolean;
 };
 
 /**
@@ -13,19 +14,19 @@ export type ReviewSummarySectionProps = {
  */
 export const ReviewSummarySection = async ({
   productId,
-  isAdmin,
 }: ReviewSummarySectionProps) => {
-  const [summary, resolvedIsAdmin] = await Promise.all([
+  const [summary, resolvedIsAdmin, stats] = await Promise.all([
     getReviewSummary(productId),
-    isAdmin === undefined ? checkAdminAccess() : Promise.resolve(isAdmin),
+    checkAdminAccess(),
+    getReviewConfidenceStats(productId),
   ]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <RegenerateSummaryButton productId={productId} isAdmin={resolvedIsAdmin} />
-      </div>
-      <ReviewSummaryDisplay summary={summary} />
-    </div>
+    <EnhancedReviewSummary
+      productId={productId}
+      isAdmin={resolvedIsAdmin}
+      initialSummary={summary}
+      stats={stats}
+    />
   );
 };
