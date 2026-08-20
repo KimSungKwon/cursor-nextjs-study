@@ -1,0 +1,39 @@
+---
+alwaysApply: false
+---
+
+현재 프로젝트에 Admin 역할 기반 라우팅과 보호 페이지를 완성해줘.
+
+## 1. proxy에서 Admin 라우트(/admin/\*) 보호 되어있는지 다시 확인 (이미 구현됨. 체크하는 용도)
+
+- /admin/\* 요청에 대해 아래 순서로 처리:
+  1. getUser()로 로그인 여부 확인 → 미로그인 시 로그인 페이지로 redirect
+  2. users 테이블에서 role 조회
+  3. role !== 'admin' → COMMERCE_URLS.HOME으로 redirect
+- /\_next, /images, /api/webhook 등 정적/예외 경로는 early return
+
+## 2. 마이페이지 사이드바 Admin 링크 조건부 표시
+
+- app/(commerce)/account/page.tsx에서 checkAdminAccess() 호출 → isAdmin: boolean 획득
+  (checkAdminAccess는 lib/auth/admin.ts에 이미 있음, boolean 반환)
+- components/commerce/AccountSidebar에 isAdmin?: boolean prop 추가
+- AccountSidebar에서 isAdmin === true일 때만 Dashboard 항목(ADMIN_URLS.DASHBOARD) 메뉴에 추가
+- activeItem prop은 기존 방식 유지
+- Admin 유저의 경우, 마이페이지 Dashboard 눌렀을때 /admin 경로로 이동하도록 라우팅 추가
+
+## 3. requireAdminAccess 구현 및 Admin 페이지 적용
+
+- lib/auth/admin.ts에 requireAdminAccess() 추가:
+  - 세션 없음 → AUTH_URLS.LOGIN으로 redirect
+  - role !== 'admin' → COMMERCE_URLS.HOME으로 redirect
+- 아래 세 파일 최상단에서 requireAdminAccess() 호출:
+  - app/admin/page.tsx
+  - app/admin/orders/page.tsx
+  - app/admin/products/page.tsx
+
+## 공통 조건
+
+- URL 상수: commons/constants/url.ts의 ADMIN_URLS, COMMERCE_URLS, AUTH_URLS 사용
+- 디자인 토큰: Admin 영역 --admin-_ prefix, Commerce 영역 --commerce-_ prefix
+- checkAdminAccess는 수정하지 말고 requireAdminAccess만 추가
+- 완성된 코드만 출력, 설명은 주석으로만 작성
