@@ -4,6 +4,7 @@ import { commerceTypography } from "@/commons/constants/typography";
 import { AUTH_URLS } from "@/commons/constants/url";
 import { AccountDetailsForm } from "@/components/account/AccountDetailsForm";
 import { AccountSidebar } from "@/components/account/AccountSidebar/AccountSidebar";
+import { checkAdminAccess } from "@/lib/auth/admin";
 import { createClient } from "@/lib/supabase/server";
 
 type UsersProfileRow = {
@@ -24,11 +25,14 @@ const AccountPage = async () => {
     redirect(AUTH_URLS.LOGIN);
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("users")
-    .select("display_name, email, role, image_url")
-    .eq("id", user.id)
-    .single();
+  const [{ data: profile, error: profileError }, isAdmin] = await Promise.all([
+    supabase
+      .from("users")
+      .select("display_name, email, role, image_url")
+      .eq("id", user.id)
+      .single(),
+    checkAdminAccess(),
+  ]);
 
   const profileRow = profile as UsersProfileRow | null;
 
@@ -68,6 +72,7 @@ const AccountPage = async () => {
           displayName={displayName}
           email={email}
           imageUrl={imageUrl}
+          isAdmin={isAdmin}
         />
         <div className="min-w-0 flex-1 lg:pt-0">
           <AccountDetailsForm

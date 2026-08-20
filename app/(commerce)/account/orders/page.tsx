@@ -62,6 +62,7 @@ async function getUserProfile(
   displayName: string | null;
   email: string;
   imageUrl: string | null;
+  isAdmin: boolean;
 }> {
   const { data: profile, error: profileError } = await supabase
     .from("users")
@@ -79,6 +80,7 @@ async function getUserProfile(
     displayName:
       !profileError && profileRow ? profileRow.display_name : null,
     imageUrl: !profileError && profileRow ? profileRow.image_url : null,
+    isAdmin: !profileError && profileRow?.role === "admin",
   };
 }
 
@@ -166,6 +168,7 @@ const OrdersPage = async ({ searchParams }: OrdersPageProps) => {
           displayName={profile.displayName}
           email={profile.email}
           imageUrl={profile.imageUrl}
+          isAdmin={profile.isAdmin}
         />
         <div className="min-w-0 flex-1">
           <OrdersTable

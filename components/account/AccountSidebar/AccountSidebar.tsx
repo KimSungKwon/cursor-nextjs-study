@@ -22,6 +22,7 @@ export type AccountSidebarProps = {
   displayName: string | null;
   email: string;
   imageUrl?: string | null;
+  isAdmin?: boolean;
 };
 
 type NavItem = {
@@ -30,14 +31,14 @@ type NavItem = {
   action?: "logout";
 };
 
-const NAV_ITEMS: NavItem[] = [
+const BASE_NAV_ITEMS: NavItem[] = [
   { label: "Account", href: ACCOUNT_URLS.ACCOUNT },
   { label: "Orders", href: ACCOUNT_URLS.ORDERS },
   { label: "Reviews", href: ACCOUNT_URLS.REVIEWS },
   { label: "Wishlist", href: ACCOUNT_URLS.WISHLIST },
-  { label: "Dashboard", href: ADMIN_URLS.DASHBOARD },
-  { label: "Log Out", action: "logout" },
 ];
+
+const LOGOUT_ITEM: NavItem = { label: "Log Out", action: "logout" };
 
 const MAX_FILE_BYTES = 1024 * 1024; // 1MB
 
@@ -64,6 +65,7 @@ export const AccountSidebar = ({
   displayName,
   email,
   imageUrl = null,
+  isAdmin = false,
 }: AccountSidebarProps) => {
   const pathname = usePathname();
   const router = useRouter();
@@ -78,6 +80,14 @@ export const AccountSidebar = ({
   useEffect(() => {
     setPreviewUrl(imageUrl);
   }, [imageUrl]);
+
+  const navItems: NavItem[] = [
+    ...BASE_NAV_ITEMS,
+    ...(isAdmin
+      ? [{ label: "Dashboard", href: ADMIN_URLS.DASHBOARD } satisfies NavItem]
+      : []),
+    LOGOUT_ITEM,
+  ];
 
   const resolvedName = displayName?.trim() || email.split("@")[0] || "User";
   const initial = resolvedName.charAt(0).toUpperCase();
@@ -226,7 +236,7 @@ export const AccountSidebar = ({
       </div>
 
       <nav className="flex w-full max-w-[230px] flex-col gap-3" aria-label="계정 내비게이션">
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const isActive =
             item.href !== undefined &&
             (pathname === item.href ||
