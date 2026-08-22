@@ -1,3 +1,38 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+상품 상세 페이지의 AI 리뷰 요약 영역에 Agent Step UI를 적용해줘.
+
+## 1. ReviewSummaryStepIndicator 컴포넌트 (신규)
+경로: components/commerce/product/ReviewSummaryStepIndicator.tsx
+
+- StepStatus 타입: "pending" | "processing" | "completed" | "failed"
+- ReviewSummaryStep 인터페이스: id, label, description, status
+- 상태별 시각적 피드백:
+  * pending: 회색 테두리 원, 번호 표시
+  * processing: --commerce-primary-main 테두리, 내부 animate-spin 스피너
+  * completed: --commerce-success-main 배경, ✓ 아이콘
+  * failed: --commerce-error-main 배경, ✕ 아이콘
+- 단계 간 수직 연결선: 완료 구간은 --commerce-primary-main, 대기는 --commerce-border-default
+- 모든 색상은 --commerce-* 디자인 토큰만 사용 (Tailwind 색상 하드코딩 금지)
+
+## 2. ReviewSummaryDisplay 개선 (또는 EnhancedReviewSummary 연동)
+경로: app/(commerce)/products/[productId]/_components/ReviewSummaryDisplay.tsx
+
+- INITIAL_STEPS 상수: prepare / analyze / generate / complete (전부 pending)
+- handleGenerate 함수 순서:
+  1. prepare → processing → 500ms → completed
+  2. analyze → processing → 1000ms → completed
+  3. generate → processing → generateAiReviewSummary 실제 호출
+  4. 성공 시 generate + complete → completed
+  5. 실패 시 현재 processing 단계 → failed
+- 상태별 렌더링 분기:
+  * summary 없음 + isGenerating false → "AI 요약 생성하기" 버튼
+  * isGenerating true → ReviewSummaryStepIndicator
+  * 완료 → 기존 요약 표시 영역
+
+## 공통 조건
+- 서버 액션: generateAiReviewSummary (review-summary-actions.ts)
+- 색상 하드코딩 금지, --commerce-* 토큰만 사용
+- 기존 RetryReviewSummaryButton 파일 수정 금지
+- 완성된 코드만 출력, 설명은 주석으로만 작성
