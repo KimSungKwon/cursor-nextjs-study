@@ -1,0 +1,58 @@
+---
+alwaysApply: false
+---
+현재 프로젝트에 Admin 대시보드 메인 페이지와 공통 헤더, 사이드바를 구현해줘.
+
+## 0. 피그마 구조 분석 후 작업
+- 어드민 메인 페이지 피그마 링크: https://www.figma.com/design/wi8a6by2DxDzvTOBu2yyUE/Commerce---Admin-%ED%85%9C%ED%94%8C%EB%A6%BF--%EB%B3%B5%EC%82%AC-?node-id=245-10964&t=G808iRRZanjTcJY1-4
+- talk to figma 채널: 6ce8wdh2
+
+## 1. 공통 레이아웃 구조
+
+- app/admin/layout.tsx:
+  * requireAdminAccess()로 권한 체크
+  * createClient + auth.getUser() + users 테이블 조회로 이메일 가져오기 (getAdminUser 함수 없음)
+  * AdminLayout 컴포넌트에 email prop 전달
+
+- components/admin/AdminLayout.tsx:
+  * h-screen flex flex-col 구조 (헤더 고정 + 사이드바 고정 + 메인 스크롤)
+  * AdminHeader, AdminSidebar import
+
+- components/admin/AdminHeader.tsx:
+  * 로고("Cursor Admin"), 쇼핑몰 이동 링크(COMMERCE_URLS.HOME), 이메일, 로그아웃 버튼
+  * 로그아웃: getSupabaseBrowserClient().auth.signOut() → router.push(홈) → router.refresh()
+  * 색상: --admin-* 디자인 토큰 사용
+
+- components/admin/AdminSidebar.tsx:
+  * usePathname()으로 현재 경로 확인, 활성 메뉴 하이라이트
+  * MENU_ITEMS: ADMIN_URLS.DASHBOARD, ADMIN_URLS.ORDERS, ADMIN_URLS.PRODUCTS
+    (ADMIN_URLS에 DASHBOARD, ORDERS, PRODUCTS만 있음 — USERS/SETTINGS 없음)
+  * 색상: --admin-* 디자인 토큰 사용
+
+## 2. app/admin/queries.ts (신규)
+
+- getTodayOrderCount(): gte/lt로 오늘 날짜 범위 필터, count: exact 사용
+- getBestSellingProducts(limit): order_items + products 조인, Map으로 product_id별 quantity 합산, 내림차순 정렬 후 slice
+- getTrendingProducts(limit): like_items + products 조인, Map으로 product_id별 like_count 집계, 내림차순 정렬 후 slice
+- getRecentOrders(limit): orders 테이블, created_at 내림차순, limit 적용
+  ⚠️ orders 테이블에 user_email 없음 — user_id만 select
+
+## 3. 대시보드 UI 컴포넌트 (신규)
+
+- components/admin/dashboard/StatCard.tsx: value, label prop 받아 통계 카드 렌더링
+- components/admin/dashboard/ProductList.tsx: title, products(product_id/product_name/image_url/count/countLabel), emptyMessage prop
+- components/admin/dashboard/RecentOrdersTable.tsx: orders(RecentOrder[]) prop, user_id 표시 또는 필요 시 users 조인
+
+## 4. app/admin/page.tsx
+
+- requireAdminAccess() 최상단 호출
+- Promise.all([getTodayOrderCount, getBestSellingProducts(10), getTrendingProducts(10), getRecentOrders(10)])
+- bestSellingProducts → ProductList용 포맷 변환 (count: total_quantity, countLabel: "판매량")
+- trendingProducts → ProductList용 포맷 변환 (count: like_count, countLabel: "좋아요")
+- 반응형 그리드: StatCard(lg:grid-cols-4), ProductList(lg:grid-cols-2), RecentOrdersTable
+
+## 공통 조건
+
+- 색상 하드코딩 금지 — Admin 영역 --admin-*, Commerce 영역 --commerce-* 토큰 사용
+- URL 상수: commons/constants/url.ts의 ADMIN_URLS, COMMERCE_URLS 사용
+- 완성된 코드만 출력, 설명은 주석으로만 작성
