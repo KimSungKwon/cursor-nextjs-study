@@ -1,104 +1,107 @@
+"use client";
+
 import Link from "next/link";
-import type { HTMLAttributes, ReactNode } from "react";
-import { adminTypography } from "@/commons/constants/typography";
-import { cn } from "@/commons/utils/cn";
-import type { AdminBreadcrumb } from "@/components/admin/types";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { COMMERCE_URLS } from "@/commons/constants/url";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
-export interface AdminHeaderProps extends HTMLAttributes<HTMLElement> {
-  title: string;
-  description?: string;
-  actions?: ReactNode;
-  breadcrumbs?: AdminBreadcrumb[];
-}
+export type AdminHeaderProps = {
+  email: string;
+};
 
-export const AdminHeader = ({
-  title,
-  description,
-  actions,
-  breadcrumbs,
-  className,
-  style,
-  ...props
-}: AdminHeaderProps) => {
+/**
+ * Admin 공통 상단 헤더
+ */
+export const AdminHeader = ({ email }: AdminHeaderProps) => {
+  const router = useRouter();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleLogout = async () => {
+    if (isSigningOut) {
+      return;
+    }
+
+    setIsSigningOut(true);
+    try {
+      const supabase = getSupabaseBrowserClient();
+      await supabase.auth.signOut();
+      router.push(COMMERCE_URLS.HOME);
+      router.refresh();
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
+
   return (
     <header
-      className={cn(
-        "border-b border-[var(--admin-border-default)] bg-[var(--admin-background-default)] px-6 py-4",
-        className,
-      )}
-      style={style}
-      {...props}
+      className="flex h-16 shrink-0 items-center justify-between border-b px-6"
+      style={{
+        backgroundColor: "var(--admin-background-default)",
+        borderColor: "var(--admin-border-default)",
+      }}
     >
-      {breadcrumbs && breadcrumbs.length > 0 ? (
-        <nav aria-label="breadcrumb" className="mb-2">
-          <ol className="flex flex-wrap items-center gap-1 text-xs">
-            {breadcrumbs.map((crumb, index) => {
-              const isLast = index === breadcrumbs.length - 1;
-              return (
-                <li key={`${crumb.label}-${index}`} className="flex items-center gap-1">
-                  {index > 0 ? (
-                    <span
-                      aria-hidden
-                      style={{ color: "var(--admin-text-muted)" }}
-                    >
-                      /
-                    </span>
-                  ) : null}
-                  {crumb.href && !isLast ? (
-                    <Link
-                      href={crumb.href}
-                      className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--admin-primary-main)]"
-                      style={{ color: "var(--admin-text-muted)" }}
-                    >
-                      {crumb.label}
-                    </Link>
-                  ) : (
-                    <span
-                      style={{
-                        color: isLast
-                          ? "var(--admin-text-primary)"
-                          : "var(--admin-text-muted)",
-                      }}
-                    >
-                      {crumb.label}
-                    </span>
-                  )}
-                </li>
-              );
-            })}
-          </ol>
-        </nav>
-      ) : null}
+      <div className="flex min-w-0 items-center gap-6">
+        <p
+          className="truncate"
+          style={{
+            fontFamily: "var(--admin-font-family-heading)",
+            fontSize: "20px",
+            fontWeight: 500,
+            lineHeight: "24px",
+            color: "var(--admin-text-primary)",
+          }}
+        >
+          Cursor Admin
+        </p>
+        <Link
+          href={COMMERCE_URLS.HOME}
+          className="transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2"
+          style={{
+            fontFamily: "var(--admin-font-family-body)",
+            fontSize: "14px",
+            fontWeight: 500,
+            lineHeight: "22px",
+            color: "var(--admin-primary-main)",
+            outlineColor: "var(--admin-primary-main)",
+          }}
+        >
+          쇼핑몰 이동
+        </Link>
+      </div>
 
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <h1
-            style={{
-              fontFamily: "var(--admin-font-family-heading)",
-              fontSize: "var(--admin-heading-h1-font-size)",
-              fontWeight: adminTypography.fontWeight.semibold,
-              lineHeight: "var(--admin-heading-h1-line-height)",
-              color: "var(--admin-text-primary)",
-            }}
-          >
-            {title}
-          </h1>
-          {description ? (
-            <p
-              className="mt-1"
-              style={{
-                fontFamily: "var(--admin-font-family-body)",
-                fontSize: "var(--admin-body-md-font-size)",
-                color: "var(--admin-text-secondary)",
-              }}
-            >
-              {description}
-            </p>
-          ) : null}
-        </div>
-        {actions ? (
-          <div className="flex shrink-0 items-center gap-2">{actions}</div>
-        ) : null}
+      <div className="flex items-center gap-4">
+        <span
+          className="hidden max-w-[240px] truncate sm:inline"
+          style={{
+            fontFamily: "var(--admin-font-family-body)",
+            fontSize: "14px",
+            lineHeight: "22px",
+            color: "var(--admin-text-secondary)",
+          }}
+          title={email}
+        >
+          {email}
+        </span>
+        <button
+          type="button"
+          disabled={isSigningOut}
+          onClick={() => {
+            void handleLogout();
+          }}
+          className="rounded-md px-3 py-1.5 transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60"
+          style={{
+            fontFamily: "var(--admin-font-family-body)",
+            fontSize: "14px",
+            fontWeight: 500,
+            lineHeight: "22px",
+            color: "var(--admin-text-primary)",
+            backgroundColor: "var(--admin-background-light)",
+            outlineColor: "var(--admin-primary-main)",
+          }}
+        >
+          {isSigningOut ? "로그아웃 중..." : "로그아웃"}
+        </button>
       </div>
     </header>
   );

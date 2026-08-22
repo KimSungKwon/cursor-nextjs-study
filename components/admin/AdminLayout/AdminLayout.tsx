@@ -1,30 +1,27 @@
-import type { HTMLAttributes, ReactNode } from "react";
-import { cn } from "@/commons/utils/cn";
+"use client";
 
-export interface AdminLayoutProps extends HTMLAttributes<HTMLDivElement> {
+import type { ReactNode } from "react";
+import { AdminHeader } from "@/components/admin/AdminHeader/AdminHeader";
+import { AdminSidebar } from "@/components/admin/AdminSidebar/AdminSidebar";
+
+export type AdminLayoutProps = {
   children: ReactNode;
-  sidebar?: ReactNode;
-  topbar?: ReactNode;
-}
+  email: string;
+};
 
-export const AdminLayout = ({
-  children,
-  sidebar,
-  topbar,
-  className,
-  style,
-  ...props
-}: AdminLayoutProps) => {
+/**
+ * Admin 공통 레이아웃 — 헤더 고정 + 사이드바 + 메인 스크롤
+ */
+export const AdminLayout = ({ children, email }: AdminLayoutProps) => {
   return (
     <div
-      className={cn("flex min-h-screen bg-[var(--admin-background-paper)]", className)}
-      style={style}
-      {...props}
+      className="flex h-screen flex-col"
+      style={{ backgroundColor: "var(--admin-background-paper)" }}
     >
-      {sidebar}
-      <div className="flex min-w-0 flex-1 flex-col">
-        {topbar}
-        <main className="flex-1">{children}</main>
+      <AdminHeader email={email} />
+      <div className="flex min-h-0 flex-1">
+        <AdminSidebar />
+        <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );
